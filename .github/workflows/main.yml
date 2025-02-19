@@ -3,7 +3,7 @@ name: Run script
 on:
   schedule:
     - cron: "0 */2 * * *"  # Ejecutar cada 2 horas
-  workflow_dispatch:  # Permite ejecutarlo manualmente desde GitHub
+  workflow_dispatch:
 
 jobs:
   run-script:
@@ -11,7 +11,7 @@ jobs:
 
     steps:
       - name: Clone repo
-        uses: actions/checkout@v4  # Usa la versión más reciente
+        uses: actions/checkout@v4
 
       - name: Ensure prev_comps.json exists
         run: |
@@ -23,21 +23,14 @@ jobs:
           fi
 
       - name: Attempt to download prev_comps.json (if exists)
-        id: download_artifact
-        continue-on-error: true  # No fallar si el archivo no existe aún
+        continue-on-error: true  # No fallar si no existe aún
         uses: actions/download-artifact@v4
         with:
           name: prev-comps
           path: .
 
-      - name: Verify prev_comps.json existence
-        run: |
-          if [ ! -f prev_comps.json ]; then
-            echo "prev_comps.json no existe después de intentar descargarlo. Creando un nuevo archivo..."
-            echo "[]" > prev_comps.json
-          else
-            echo "prev_comps.json descargado correctamente."
-          fi
+      - name: Debug artifact download
+        run: ls -lah && cat prev_comps.json || echo "⚠️ No se encontró prev_comps.json"
 
       - name: Setup Python
         uses: actions/setup-python@v4
@@ -57,3 +50,4 @@ jobs:
         with:
           name: prev-comps
           path: prev_comps.json
+          retention-days: 30  # Mantiene el Artifact disponible por 30 días
