@@ -34,9 +34,9 @@ jobs:
           git config --global user.email "github-actions@github.com"
           git add prev_comps.json
           if git diff --cached --quiet; then
-            echo "✅ No hay cambios en prev_comps.json, no se hace commit."
+            echo "✅ No changes in prev_comps.json"
           else
-            git commit -m "Actualizar prev_comps.json automáticamente"
+            git commit -m "update prev_comps.json"
             git push origin main
-            echo "✅ prev_comps.json actualizado y subido al repo."
+            echo "✅ prev_comps.json updated"
           fi
