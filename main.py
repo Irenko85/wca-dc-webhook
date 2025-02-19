@@ -4,15 +4,23 @@ import datetime
 import json
 from dotenv import load_dotenv
 
+# 🔹 Cargar variables desde el archivo .env (si existe)
 load_dotenv()
 
-# Cargar variables desde los Secrets de GitHub
+# 🔹 Obtener el Webhook de Discord desde las variables de entorno
 DISCORD_WEBHOOK_URL = os.getenv("DISCORD_WEBHOOK_URL")
 
-# Archivo donde se guardan las competencias previas
+# 🔹 Verificar si la variable de entorno está cargada correctamente
+if not DISCORD_WEBHOOK_URL:
+    print("❌ ERROR: La variable de entorno DISCORD_WEBHOOK_URL no está configurada.")
+    exit(1)  # Detener la ejecución si no se encuentra la variable
+
+# 🔹 Archivo donde se guardan las competencias previas
 PREV_COMPS_FILE = "prev_comps.json"
 
+# 🔹 Si el archivo `prev_comps.json` no existe, crearlo vacío y evitar errores
 if not os.path.exists(PREV_COMPS_FILE):
+    print("⚠️ prev_comps.json not found. Creting empty file...")
     with open(PREV_COMPS_FILE, "w") as file:
         json.dump([], file)
 
@@ -49,10 +57,12 @@ def get_competitions(country="CL"):
 
 def load_previous_competitions():
     """Carga la lista de competencias previas desde un archivo JSON."""
-    if os.path.exists(PREV_COMPS_FILE):
+    try:
         with open(PREV_COMPS_FILE, "r") as file:
             return json.load(file)
-    return []
+    except (json.JSONDecodeError, FileNotFoundError):
+        print("⚠️ Error reading prev_comps.json. Creating empty file...")
+        return []
 
 
 def save_competitions(competitions):
@@ -108,6 +118,7 @@ def create_discord_embeds(competitions):
 def send_discord_notification(new_comps):
     """Envía notificación a Discord si hay nuevas competencias."""
     if not new_comps:
+        print("✅ No new competitions to notify.")
         return
 
     embeds = create_discord_embeds(new_comps)  # Generamos los embeds
@@ -119,20 +130,26 @@ def send_discord_notification(new_comps):
         }
         response = requests.post(DISCORD_WEBHOOK_URL, json=data)
         if response.status_code == 204:
-            print("✅ Notification sent to Discord.")
+            print("✅ Notification sent successfully.")
         else:
-            print(f"⚠️ Error sending embed to Discord: {response.status_code}")
+            print(f"⚠️ Error sending message: {response.status_code}")
 
 
 if __name__ == "__main__":
     current_comps = get_competitions()
     previous_comps = load_previous_competitions()
 
+    print("🔍 Comparando con prev_comps.json...")
+    print(f"📌 Competencias previas: {len(previous_comps)}")
+    print(f"📌 Competencias actuales: {len(current_comps)}")
+
     new_comps = detect_new_competitions(current_comps, previous_comps)
 
     if new_comps:
-        print("🎉 New competitions detected. Sending notification...")
+        print(
+            f"🎉 Se detectaron {len(new_comps)} nuevas competencias. Enviando notificación..."
+        )
         send_discord_notification(new_comps)
         save_competitions(current_comps)
     else:
-        print("✅ No new competitions.")
+        print("✅ No hay competencias nuevas.")
