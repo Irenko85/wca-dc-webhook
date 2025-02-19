@@ -17,14 +17,27 @@ jobs:
         run: |
           if [ ! -f prev_comps.json ]; then
             echo "[]" > prev_comps.json
+            echo "prev_comps.json no encontrado. Se ha creado un archivo vacío."
+          else
+            echo "prev_comps.json encontrado. Usando archivo existente."
           fi
 
-      - name: Get prev_comps.json (if exists)
+      - name: Attempt to download prev_comps.json (if exists)
+        id: download_artifact
+        continue-on-error: true  # No fallar si el archivo no existe aún
         uses: actions/download-artifact@v4
-        continue-on-error: true  # Si el archivo no existe, sigue con la ejecución
         with:
           name: prev-comps
           path: .
+
+      - name: Verify prev_comps.json existence
+        run: |
+          if [ ! -f prev_comps.json ]; then
+            echo "prev_comps.json no existe después de intentar descargarlo. Creando un nuevo archivo..."
+            echo "[]" > prev_comps.json
+          else
+            echo "prev_comps.json descargado correctamente."
+          fi
 
       - name: Setup Python
         uses: actions/setup-python@v4
