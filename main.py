@@ -4,23 +4,18 @@ import datetime
 import json
 from dotenv import load_dotenv
 
-# 🔹 Cargar variables desde el archivo .env (si existe)
+# 🔹 Cargar variables desde el archivo .env
 load_dotenv()
 
 # 🔹 Obtener el Webhook de Discord desde las variables de entorno
 DISCORD_WEBHOOK_URL = os.getenv("DISCORD_WEBHOOK_URL")
 
-# 🔹 Verificar si la variable de entorno está cargada correctamente
-if not DISCORD_WEBHOOK_URL:
-    print("❌ ERROR: La variable de entorno DISCORD_WEBHOOK_URL no está configurada.")
-    exit(1)  # Detener la ejecución si no se encuentra la variable
-
-# 🔹 Archivo donde se guardan las competencias previas
+# 🔹 Archivo donde se guardan las competencias previas (ahora en el repo)
 PREV_COMPS_FILE = "prev_comps.json"
 
-# 🔹 Si el archivo `prev_comps.json` no existe, crearlo vacío y evitar errores
+# 🔹 Verificar si `prev_comps.json` existe
 if not os.path.exists(PREV_COMPS_FILE):
-    print("⚠️ prev_comps.json not found. Creting empty file...")
+    print("⚠️ prev_comps.json no encontrado. Creando archivo vacío...")
     with open(PREV_COMPS_FILE, "w") as file:
         json.dump([], file)
 
@@ -61,14 +56,20 @@ def load_previous_competitions():
         with open(PREV_COMPS_FILE, "r") as file:
             return json.load(file)
     except (json.JSONDecodeError, FileNotFoundError):
-        print("⚠️ Error reading prev_comps.json. Creating empty file...")
+        print("⚠️ Error al leer prev_comps.json. Creando un archivo vacío...")
         return []
 
 
 def save_competitions(competitions):
-    """Guarda la lista actual de competencias en un archivo JSON."""
-    with open(PREV_COMPS_FILE, "w") as file:
-        json.dump(competitions, file, indent=4)
+    """Guarda la lista actual de competencias en un archivo JSON si hay cambios."""
+    previous_comps = load_previous_competitions()
+
+    if previous_comps != competitions:  # Guardar solo si hay cambios
+        with open(PREV_COMPS_FILE, "w") as file:
+            json.dump(competitions, file, indent=4)
+        print("✅ prev_comps.json actualizado correctamente.")
+    else:
+        print("✅ No hay cambios en las competencias, no se actualiza prev_comps.json.")
 
 
 def detect_new_competitions(current_comps, previous_comps):
@@ -78,70 +79,35 @@ def detect_new_competitions(current_comps, previous_comps):
     return new_comps
 
 
-def create_discord_embeds(competitions):
-    """Genera una lista de embeds de Discord para las nuevas competencias."""
-    embeds = []
-
-    for comp in competitions:
-        start_date = comp["start_date"]
-        end_date = comp["end_date"]
-
-        # Manejo de fechas para competencias de más de 1 día
-        if start_date == end_date:
-            date_text = f"📅 **Fecha:** {start_date}"
-        else:
-            days = (
-                datetime.datetime.strptime(end_date, "%Y-%m-%d")
-                - datetime.datetime.strptime(start_date, "%Y-%m-%d")
-            ).days + 1
-            date_text = f"📅 **Fechas:** {start_date} → {end_date} ({days} días)"
-
-        # Obtener eventos de la competencia
-        event_ids = comp.get("event_ids", [])
-        event_names = [EVENTS.get(event_id, event_id) for event_id in event_ids]
-        events_text = (
-            ", ".join(event_names) if event_names else "No hay eventos disponibles"
-        )
-
-        embed = {
-            "title": f"🏆 {comp['name']}",
-            "description": f"📍 **Ciudad:** {comp['city']}\n{date_text}\n🎯 **Eventos:** {events_text}",
-            "url": comp["url"],
-            "color": 0x002C99,
-        }
-
-        embeds.append(embed)
-
-    return embeds
-
-
 def send_discord_notification(new_comps):
     """Envía notificación a Discord si hay nuevas competencias."""
     if not new_comps:
-        print("✅ No new competitions to notify.")
+        print("✅ No hay nuevas competencias. No se enviará notificación.")
         return
 
-    embeds = create_discord_embeds(new_comps)  # Generamos los embeds
+    data = {
+        "content": "🎉 **¡Nuevos torneos!**",
+        "embeds": [
+            {
+                "title": f"🏆 {comp['name']}",
+                "description": f"📍 {comp['city']}\n📅 {comp['start_date']}",
+                "url": comp["url"],
+                "color": 0x002C99,
+            }
+            for comp in new_comps
+        ],
+    }
 
-    if DISCORD_WEBHOOK_URL:
-        data = {
-            "content": "🎉 **¡Nuevos torneos!**",
-            "embeds": embeds,
-        }
-        response = requests.post(DISCORD_WEBHOOK_URL, json=data)
-        if response.status_code == 204:
-            print("✅ Notification sent successfully.")
-        else:
-            print(f"⚠️ Error sending message: {response.status_code}")
+    response = requests.post(DISCORD_WEBHOOK_URL, json=data)
+    if response.status_code == 204:
+        print("✅ Notificación enviada a Discord.")
+    else:
+        print(f"⚠️ Error enviando embed a Discord: {response.status_code}")
 
 
 if __name__ == "__main__":
     current_comps = get_competitions()
     previous_comps = load_previous_competitions()
-
-    print("🔍 Comparando con prev_comps.json...")
-    print(f"📌 Competencias previas: {len(previous_comps)}")
-    print(f"📌 Competencias actuales: {len(current_comps)}")
 
     new_comps = detect_new_competitions(current_comps, previous_comps)
 
@@ -150,6 +116,6 @@ if __name__ == "__main__":
             f"🎉 Se detectaron {len(new_comps)} nuevas competencias. Enviando notificación..."
         )
         send_discord_notification(new_comps)
-        save_competitions(current_comps)
+        save_competitions(current_comps)  # Guardar solo si hay cambios
     else:
         print("✅ No hay competencias nuevas.")
