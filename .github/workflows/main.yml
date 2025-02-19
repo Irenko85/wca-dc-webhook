@@ -1,0 +1,44 @@
+name: Run script
+
+on:
+  schedule:
+    - cron: "0 */2 * * *"  # Ejecutar cada 2 horas
+  workflow_dispatch:  # Permite ejecutarlo manualmente desde GitHub
+
+jobs:
+  run-script:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Clone repo
+        uses: actions/checkout@v4  # Usa la versión más reciente
+
+      - name: Ensure prev_comps.json exists
+        run: |
+          if [ ! -f prev_comps.json ]; then
+            echo "[]" > prev_comps.json
+          fi
+
+      - name: Get prev_comps.json (if exists)
+        uses: actions/download-artifact@v4
+        continue-on-error: true  # Si el archivo no existe, sigue con la ejecución
+        with:
+          name: prev-comps
+          path: .
+
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.10"
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Run main script
+        run: python main.py
+
+      - name: Save prev_comps.json
+        uses: actions/upload-artifact@v4
+        with:
+          name: prev-comps
+          path: prev_comps.json
