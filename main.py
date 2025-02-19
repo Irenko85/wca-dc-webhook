@@ -2,12 +2,37 @@ import os
 import requests
 import datetime
 import json
+from dotenv import load_dotenv
+
+load_dotenv()
 
 # Cargar variables desde los Secrets de GitHub
 DISCORD_WEBHOOK_URL = os.getenv("DISCORD_WEBHOOK_URL")
 
 # Archivo donde se guardan las competencias previas
 PREV_COMPS_FILE = "prev_comps.json"
+
+if not os.path.exists(PREV_COMPS_FILE):
+    with open(PREV_COMPS_FILE, "w") as file:
+        json.dump([], file)
+
+EVENTS = {
+    "222": "2x2",
+    "333": "3x3",
+    "444": "4x4",
+    "555": "5x5",
+    "666": "6x6",
+    "777": "7x7",
+    "333bf": "3BLD",
+    "333fm": "FMC",
+    "333mbf": "Multi-Blind",
+    "333oh": "OH",
+    "clock": "Clock",
+    "minx": "Megaminx",
+    "pyram": "Pyraminx",
+    "skewb": "Skewb",
+    "sq1": "Square-1",
+}
 
 
 def get_competitions(country="CL"):
@@ -51,17 +76,28 @@ def create_discord_embeds(competitions):
         start_date = comp["start_date"]
         end_date = comp["end_date"]
 
-        # Si la competencia dura más de un día, lo indicamos en la fecha
+        # Manejo de fechas para competencias de más de 1 día
         if start_date == end_date:
-            date_text = f"📅 **Date:** {start_date}"
+            date_text = f"📅 **Fecha:** {start_date}"
         else:
-            date_text = f"📅 **Dates:** {start_date} → {end_date} ({(datetime.datetime.strptime(end_date, '%Y-%m-%d') - datetime.datetime.strptime(start_date, '%Y-%m-%d')).days + 1} days)"
+            days = (
+                datetime.datetime.strptime(end_date, "%Y-%m-%d")
+                - datetime.datetime.strptime(start_date, "%Y-%m-%d")
+            ).days + 1
+            date_text = f"📅 **Fechas:** {start_date} → {end_date} ({days} días)"
+
+        # Obtener eventos de la competencia
+        event_ids = comp.get("event_ids", [])
+        event_names = [EVENTS.get(event_id, event_id) for event_id in event_ids]
+        events_text = (
+            ", ".join(event_names) if event_names else "No hay eventos disponibles"
+        )
 
         embed = {
             "title": f"🏆 {comp['name']}",
-            "description": f"📍 **City:** {comp['city']}\n{date_text}",
+            "description": f"📍 **Ciudad:** {comp['city']}\n{date_text}\n🎯 **Eventos:** {events_text}",
             "url": comp["url"],
-            "color": 0x002C99,  # Azul
+            "color": 0x002C99,
         }
 
         embeds.append(embed)
