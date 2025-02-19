@@ -12,25 +12,8 @@ jobs:
     steps:
       - name: Clone repo
         uses: actions/checkout@v4
-
-      - name: Ensure prev_comps.json exists
-        run: |
-          if [ ! -f prev_comps.json ]; then
-            echo "[]" > prev_comps.json
-            echo "prev_comps.json no encontrado. Se ha creado un archivo vacío."
-          else
-            echo "prev_comps.json encontrado. Usando archivo existente."
-          fi
-
-      - name: Attempt to download prev_comps.json (if exists)
-        continue-on-error: true  # No fallar si no existe aún
-        uses: actions/download-artifact@v4
         with:
-          name: prev-comps
-          path: .
-
-      - name: Debug artifact download
-        run: ls -lah && cat prev_comps.json || echo "⚠️ No se encontró prev_comps.json"
+          token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Setup Python
         uses: actions/setup-python@v4
@@ -45,9 +28,15 @@ jobs:
           DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
         run: python main.py
 
-      - name: Save prev_comps.json
-        uses: actions/upload-artifact@v4
-        with:
-          name: prev-comps
-          path: prev_comps.json
-          retention-days: 30  # Mantiene el Artifact disponible por 30 días
+      - name: Commit and push if prev_comps.json changed
+        run: |
+          git config --global user.name "github-actions"
+          git config --global user.email "github-actions@github.com"
+          git add prev_comps.json
+          if git diff --cached --quiet; then
+            echo "✅ No hay cambios en prev_comps.json, no se hace commit."
+          else
+            git commit -m "Actualizar prev_comps.json automáticamente"
+            git push origin main
+            echo "✅ prev_comps.json actualizado y subido al repo."
+          fi
