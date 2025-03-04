@@ -310,7 +310,7 @@ def send_discord_notification(
 
     # Prepare message content based on competition type
     if is_new:
-        content = f"🎉 **¡{len(competitions)} nuevo{'s' if len(competitions) > 1 else ''} torneo{'s' if len(competitions) > 1 else ''}!**"
+        content = f"🎉 @everyone **¡{len(competitions)} nuevo{'s' if len(competitions) > 1 else ''} torneo{'s' if len(competitions) > 1 else ''}!**"
     else:
         content = f"📋 **Recordatorio: {len(competitions)} torneo{'s' if len(competitions) > 1 else ''} próximamente**"
 
