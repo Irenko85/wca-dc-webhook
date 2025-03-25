@@ -235,11 +235,6 @@ def create_discord_embeds(
         if status == "ongoing":
             status_emoji += "🔴 EN CURSO: "
 
-        # Get venue if available
-        venue_info = ""
-        if comp.get("venue_name") and comp.get("venue_address"):
-            venue_info = f"🏢 **Sede:** {comp['venue_name']}\n📌 **Dirección:** {comp['venue_address']}\n"
-
         # Get registration status
         reg_info = ""
         if comp.get("registration_open") and comp.get("registration_close"):
@@ -258,14 +253,20 @@ def create_discord_embeds(
             ", ".join(event_names) if event_names else "No hay eventos disponibles"
         )
 
+        # Get competitors limit if available
+        competitors_limit = comp.get("competitor_limit")
+        limit_info = ""
+        if competitors_limit:
+            limit_info = f"👥 **Límite de competidores:** {competitors_limit}\n"
+
         # Create embed
         embed = {
             "title": f"{status_emoji}{comp['name']}",
             "description": (
                 f"🌎 **Ciudad:** {comp.get('city', 'No disponible')}\n"
                 f"{date_text}\n"
-                f"{venue_info}"
                 f"{reg_info}"
+                f"{limit_info}"
                 f"🎯 **Eventos:** {events_text}"
             ),
             "url": comp["url"],
