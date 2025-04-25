@@ -23,6 +23,14 @@ DISCORD_WEBHOOK_URL = os.getenv("DISCORD_WEBHOOK_URL")
 if not DISCORD_WEBHOOK_URL:
     logger.warning("DISCORD_WEBHOOK_URL not found in environment variables!")
 
+# Get Telegram bot token and channel ID from environment variables
+TELEGRAM_BOT_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN")
+TELEGRAM_CHANNEL_ID = os.getenv("TELEGRAM_CHANNEL_ID")
+if not TELEGRAM_BOT_TOKEN or not TELEGRAM_CHANNEL_ID:
+    logger.warning(
+        "TELEGRAM_BOT_TOKEN or TELEGRAM_CHANNEL_ID not found in environment variables!"
+    )
+
 # Constants
 PREV_COMPS_FILE = Path("prev_comps.json")
 DEFAULT_COUNTRY = "CL"  # Chile as default country
@@ -199,92 +207,202 @@ def create_discord_embeds(
     embeds = []
 
     for comp in competitions:
-        start_date = comp["start_date"]
-        end_date = comp["end_date"]
+        comp_info = format_competition_info(comp)
 
-        # Format dates for display
-        start_date_fmt = datetime.datetime.strptime(start_date, "%Y-%m-%d").strftime(
-            "%d/%m/%Y"
-        )
-        end_date_fmt = datetime.datetime.strptime(end_date, "%Y-%m-%d").strftime(
-            "%d/%m/%Y"
-        )
-
-        # Handle multi-day competitions
-        if start_date == end_date:
-            date_text = f"📅 **Fecha:** {start_date_fmt}"
-        else:
-            days = (
-                datetime.datetime.strptime(end_date, "%Y-%m-%d")
-                - datetime.datetime.strptime(start_date, "%Y-%m-%d")
-            ).days + 1
-            date_text = (
-                f"📅 **Fechas:** {start_date_fmt} → {end_date_fmt} ({days} días)"
-            )
-
-        # Get competition status and set appropriate color
-        status = get_competition_status(comp)
+        # Set color based on status and whether it's new
         color = (
             EMBED_COLORS["new"]
             if is_new
-            else EMBED_COLORS.get(status, EMBED_COLORS["upcoming"])
+            else EMBED_COLORS.get(comp_info["status"], EMBED_COLORS["upcoming"])
         )
 
-        # Create status indicator
-        status_emoji = "✨ NUEVO: " if is_new else ""
-        if status == "ongoing":
-            status_emoji += "🔴 EN CURSO: "
-
-        # Get registration status
-        reg_info = ""
-        if comp.get("registration_open") and comp.get("registration_close"):
-            reg_open = datetime.datetime.strptime(
-                comp["registration_open"], "%Y-%m-%dT%H:%M:%S.%fZ"
-            ).strftime("%d/%m/%Y")
-            reg_close = datetime.datetime.strptime(
-                comp["registration_close"], "%Y-%m-%dT%H:%M:%S.%fZ"
-            ).strftime("%d/%m/%Y")
-            reg_info = f"📝 **Registro:** {reg_open} → {reg_close}\n"
-
-        # Get event categories
-        event_ids = comp.get("event_ids", [])
-        event_names = [EVENTS.get(event_id, event_id) for event_id in event_ids]
-        events_text = (
-            ", ".join(event_names) if event_names else "No hay eventos disponibles"
-        )
-
-        # Get competitors limit if available
-        competitors_limit = comp.get("competitor_limit")
-        limit_info = ""
-        if competitors_limit:
-            limit_info = f"👥 **Límite de competidores:** {competitors_limit}\n"
+        # Add "NEW" prefix if it's a new competition
+        title_prefix = "✨ NUEVO: " if is_new else ""
+        title = f"{title_prefix}{comp_info['status_emoji']}{comp_info['name']}"
 
         # Create embed
         embed = {
-            "title": f"{status_emoji}{comp['name']}",
+            "title": title,
             "description": (
-                f"🌎 **Ciudad:** {comp.get('city', 'No disponible')}\n"
-                f"{date_text}\n"
-                f"{reg_info}"
-                f"{limit_info}"
-                f"🎯 **Eventos:** {events_text}"
+                f"🌎 **Ciudad:** {comp_info['city']}\n"
+                f"{comp_info['date_text']}\n"
+                f"{comp_info['reg_info']}"
+                f"{comp_info['limit_info']}"
+                f"🎯 **Eventos:** {comp_info['events_text']}"
             ),
-            "url": comp["url"],
+            "url": comp_info["url"],
             "color": color,
-            "footer": {"text": f"WCA Competition ID: {comp['id']}"},
+            "footer": {"text": f"WCA Competition ID: {comp_info['id']}"},
         }
 
-        # Add thumbnail if available
-        if comp.get("country"):
-            country_code = comp.get("country").get("iso2", "").lower()
-            if country_code:
-                embed["thumbnail"] = {
-                    "url": f"https://flagcdn.com/w80/{country_code}.png"
-                }
+        # Add thumbnail if country code is available
+        if comp_info["country_code"]:
+            embed["thumbnail"] = {
+                "url": f"https://flagcdn.com/w80/{comp_info['country_code']}.png"
+            }
 
         embeds.append(embed)
 
     return embeds
+
+
+def create_telegram_message(competition: Dict[str, Any], header: str) -> str:
+    """
+    Create a formatted Telegram message for a single competition.
+
+    Args:
+        competition: Competition dictionary
+        header: Notification header text
+
+    Returns:
+        Formatted Telegram message
+    """
+    comp_info = format_competition_info(competition)
+
+    return (
+        f"{header}\n\n"
+        f"🏆 *{comp_info['name']}*\n"
+        f"🌍 Ciudad: {comp_info['city']}\n"
+        f"{comp_info['date_text_plain']}\n"
+        f"{comp_info['reg_info_plain']}"
+        f"{comp_info['limit_info_plain']}"
+        f"🎯 Eventos: {comp_info['events_text']}\n"
+        f"🔗 [Más información]({comp_info['url']})"
+    )
+
+
+def format_competition_info(comp: Dict[str, Any]) -> Dict[str, str]:
+    """
+    Format competition information into a standardized dictionary.
+
+    Args:
+        comp: Competition dictionary from WCA API
+
+    Returns:
+        Dictionary with formatted competition information
+    """
+
+    # Format dates
+    start_date = comp["start_date"]
+    end_date = comp["end_date"]
+
+    start_date_fmt = datetime.datetime.strptime(start_date, "%Y-%m-%d").strftime(
+        "%d/%m/%Y"
+    )
+    end_date_fmt = datetime.datetime.strptime(end_date, "%Y-%m-%d").strftime("%d/%m/%Y")
+
+    # Handle multi-day competitions
+    if start_date == end_date:
+        date_text = f"📅 **Fecha:** {start_date_fmt}"
+        date_text_plain = f"📅 Fecha: {start_date_fmt}"
+    else:
+        days = (
+            datetime.datetime.strptime(end_date, "%Y-%m-%d")
+            - datetime.datetime.strptime(start_date, "%Y-%m-%d")
+        ).days + 1
+        date_text = f"📅 **Fechas:** {start_date_fmt} → {end_date_fmt} ({days} días)"
+        date_text_plain = f"📅 Fechas: {start_date_fmt} → {end_date_fmt}"
+
+    # Format registration information
+    reg_info = ""
+    reg_info_plain = ""
+    if comp.get("registration_open") and comp.get("registration_close"):
+        reg_open = datetime.datetime.strptime(
+            comp["registration_open"], "%Y-%m-%dT%H:%M:%S.%fZ"
+        ).strftime("%d/%m/%Y")
+        reg_close = datetime.datetime.strptime(
+            comp["registration_close"], "%Y-%m-%dT%H:%M:%S.%fZ"
+        ).strftime("%d/%m/%Y")
+        reg_info = f"📝 **Registro:** {reg_open} → {reg_close}\n"
+        reg_info_plain = f"📝 Registro: {reg_open} → {reg_close}\n"
+
+    # Format events
+    event_ids = comp.get("event_ids", [])
+    event_names = [EVENTS.get(event_id, event_id) for event_id in event_ids]
+    events_text = (
+        ", ".join(event_names) if event_names else "No hay eventos disponibles"
+    )
+
+    # Format competitors limit
+    limit_info = ""
+    limit_info_plain = ""
+    if comp.get("competitor_limit"):
+        limit_info = f"👥 **Límite de competidores:** {comp['competitor_limit']}\n"
+        limit_info_plain = f"👥 Límite de competidores: {comp['competitor_limit']}\n"
+
+    # Get competition status
+    status = get_competition_status(comp)
+    status_emoji = ""
+    if status == "ongoing":
+        status_emoji = "🔴 EN CURSO: "
+
+    return {
+        "name": comp["name"],
+        "city": comp.get("city", "No disponible"),
+        "url": comp["url"],
+        "date_text": date_text,
+        "date_text_plain": date_text_plain,
+        "reg_info": reg_info,
+        "reg_info_plain": reg_info_plain,
+        "events_text": events_text,
+        "limit_info": limit_info,
+        "limit_info_plain": limit_info_plain,
+        "status": status,
+        "status_emoji": status_emoji,
+        "id": comp["id"],
+        "country_code": comp.get("country", {}).get("iso2", "").lower(),
+    }
+
+
+def sort_competitions_by_date(
+    competitions: List[Dict[str, Any]], reverse: bool = False
+) -> List[Dict[str, Any]]:
+    """
+    Sort competitions by start date.
+
+    Args:
+        competitions: List of competition dictionaries
+        reverse: If True, sort from furthest to soonest (default: False, soonest first)
+
+    Returns:
+        Sorted list of competition dictionaries
+    """
+    # Sort competitions by start_date
+    return sorted(
+        competitions,
+        key=lambda comp: datetime.datetime.strptime(comp["start_date"], "%Y-%m-%d"),
+        reverse=reverse,
+    )
+
+
+def create_notification_header(
+    competitions: List[Dict[str, Any]], is_new: bool = False
+) -> Dict[str, str]:
+    """
+    Create header texts for notifications.
+
+    Args:
+        competitions: List of competition dictionaries
+        is_new: Whether these are newly detected competitions
+
+    Returns:
+        Dictionary with header texts for different platforms
+    """
+    comp_count = len(competitions)
+    plural_suffix = "s" if comp_count > 1 else ""
+
+    if is_new:
+        discord_header = f"🎉 @everyone **¡{comp_count} nuevo{plural_suffix} torneo{plural_suffix}!**"
+        telegram_header = f"🎉 **¡Nuevo torneo!**"
+    else:
+        discord_header = (
+            f"📋 **Recordatorio: {comp_count} torneo{plural_suffix} próximamente**"
+        )
+        telegram_header = (
+            f"📋 **Recordatorio: {comp_count} torneo{plural_suffix} próximamente**"
+        )
+
+    return {"discord": discord_header, "telegram": telegram_header}
 
 
 def send_discord_notification(
@@ -307,13 +425,11 @@ def send_discord_notification(
         logger.error("Discord webhook URL not configured. Cannot send notification.")
         return False
 
-    embeds = create_discord_embeds(competitions, is_new)
+    # Sort competitions by start date
+    sorted_comps = sort_competitions_by_date(competitions)
 
-    # Prepare message content based on competition type
-    if is_new:
-        content = f"🎉 @everyone **¡{len(competitions)} nuevo{'s' if len(competitions) > 1 else ''} torneo{'s' if len(competitions) > 1 else ''}!**"
-    else:
-        content = f"📋 **Recordatorio: {len(competitions)} torneo{'s' if len(competitions) > 1 else ''} próximamente**"
+    embeds = create_discord_embeds(sorted_comps, is_new)
+    header = create_notification_header(competitions, is_new)["discord"]
 
     # Discord has a limit of 10 embeds per webhook message
     # Split into batches if needed
@@ -322,7 +438,7 @@ def send_discord_notification(
         batch_embeds = embeds[i : i + batch_size]
 
         # Adjust content for batched messages
-        batch_content = content
+        batch_content = header
         if i > 0:
             batch_content += f" (Parte {i//batch_size + 1})"
 
@@ -342,6 +458,57 @@ def send_discord_notification(
         except requests.exceptions.RequestException as e:
             logger.error(f"Error sending Discord notification: {e}")
             return False
+
+    return True
+
+
+def send_telegram_notification(
+    competitions: List[Dict[str, Any]], is_new: bool = False
+) -> bool:
+    """Send a notification to Telegram about competitions.
+
+    Args:
+        competitions: List of competition dictionaries
+        is_new: Whether these are newly detected competitions
+
+    Returns:
+        True if notification was sent successfully, False otherwise
+    """
+    if not competitions:
+        logger.info("No competitions to notify. Skipping Telegram notification.")
+        return False
+
+    if not TELEGRAM_BOT_TOKEN or not TELEGRAM_CHANNEL_ID:
+        logger.error("Telegram credentials not configured. Cannot send notification.")
+        return False
+
+    header = create_notification_header(competitions, is_new)["telegram"]
+    sorted_comps = sort_competitions_by_date(competitions)  # Sort by start date
+
+    for comp in sorted_comps:
+        msg = create_telegram_message(comp, header)
+
+        payload = {
+            "chat_id": TELEGRAM_CHANNEL_ID,
+            "text": msg,
+            "parse_mode": "Markdown",
+            "disable_web_page_preview": False,
+        }
+
+        try:
+            response = requests.post(
+                f"https://api.telegram.org/bot{TELEGRAM_BOT_TOKEN}/sendMessage",
+                json=payload,
+                timeout=REQUEST_TIMEOUT,
+            )
+            response.raise_for_status()
+        except requests.exceptions.RequestException as e:
+            logger.error(f"Error al enviar mensaje a Telegram: {e}")
+            return False
+
+    logger.info(
+        f"Telegram notification sent successfully ({len(competitions)} competitions)"
+    )
 
     return True
 
@@ -379,6 +546,7 @@ def main() -> None:
     if new_comps:
         logger.info(f"Detected {len(new_comps)} new competitions")
         send_discord_notification(new_comps, is_new=True)
+        send_telegram_notification(new_comps, is_new=True)
         # Save updated competitions list
         save_competitions(current_comps)
     else:
