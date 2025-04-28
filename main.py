@@ -18,18 +18,21 @@ logger = logging.getLogger(__name__)
 # Load environment variables
 load_dotenv()
 
-# Get Discord webhook URL from environment variables
-DISCORD_WEBHOOK_URL = os.getenv("DISCORD_WEBHOOK_URL")
-if not DISCORD_WEBHOOK_URL:
-    logger.warning("DISCORD_WEBHOOK_URL not found in environment variables!")
 
-# Get Telegram bot token and channel ID from environment variables
-TELEGRAM_BOT_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN")
-TELEGRAM_CHANNEL_ID = os.getenv("TELEGRAM_CHANNEL_ID")
-if not TELEGRAM_BOT_TOKEN or not TELEGRAM_CHANNEL_ID:
-    logger.warning(
-        "TELEGRAM_BOT_TOKEN or TELEGRAM_CHANNEL_ID not found in environment variables!"
-    )
+def check_env_var(var_name: str) -> Optional[str]:
+    """Check if an environment variable exists and log a warning if not."""
+    value = os.getenv(var_name)
+    if not value:
+        logger.warning(
+            f"{var_name} not found in environment variables! Was the main.yml updated?"
+        )
+    return value
+
+
+# Get Discord webhook URL and Telegram credentials
+DISCORD_WEBHOOK_URL = check_env_var("DISCORD_WEBHOOK_URL")
+TELEGRAM_BOT_TOKEN = check_env_var("TELEGRAM_BOT_TOKEN")
+TELEGRAM_CHANNEL_ID = check_env_var("TELEGRAM_CHANNEL_ID")
 
 # Constants
 PREV_COMPS_FILE = Path("prev_comps.json")
