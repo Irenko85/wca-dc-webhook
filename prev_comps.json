@@ -1,5 +1,107 @@
 [
     {
+        "id": "GimnasiodelaMenteOpen2025",
+        "name": "Gimnasio de la Mente Open 2025",
+        "venue": "[Gimnasio de la Mente](https://gimnasiodelamente.cl)",
+        "registration_open": "2025-06-21T20:00:00.000Z",
+        "registration_close": "2025-08-21T04:01:00.000Z",
+        "results_posted_at": null,
+        "announced_at": "2025-06-17T05:58:04.000Z",
+        "start_date": "2025-08-23",
+        "end_date": "2025-08-23",
+        "competitor_limit": 20,
+        "cancelled_at": null,
+        "url": "https://www.worldcubeassociation.org/competitions/GimnasiodelaMenteOpen2025",
+        "website": "https://www.worldcubeassociation.org/competitions/GimnasiodelaMenteOpen2025",
+        "short_name": "Gimnasio de la Mente Open 2025",
+        "short_display_name": "Gimnasio de la Mente Open 2025",
+        "city": "Santiago",
+        "venue_address": "V\u00edctor Hendrych 360, Providencia, Santiago de Chile",
+        "venue_details": "The competition will take place in the main hall.",
+        "latitude_degrees": -33.445681,
+        "longitude_degrees": -70.631782,
+        "country_iso2": "CL",
+        "event_ids": [
+            "333bf",
+            "333oh",
+            "clock",
+            "skewb",
+            "sq1"
+        ],
+        "time_until_registration": "5 days",
+        "date_range": "Aug 23, 2025",
+        "delegates": [
+            {
+                "id": 273,
+                "created_at": "2015-06-02T01:35:25.000Z",
+                "updated_at": "2025-06-16T01:49:06.000Z",
+                "name": "Felipe Andres Rojas Garces",
+                "wca_id": "2009GARC02",
+                "gender": "m",
+                "country_iso2": "CL",
+                "url": "https://www.worldcubeassociation.org/persons/2009GARC02",
+                "country": {
+                    "id": "Chile",
+                    "name": "Chile",
+                    "continent_id": "_South America",
+                    "iso2": "CL"
+                },
+                "delegate_status": "delegate",
+                "email": "fgarces@worldcubeassociation.org",
+                "location": "Chile (Santiago)",
+                "region_id": 51,
+                "class": "user",
+                "teams": [],
+                "avatar": {
+                    "id": 119,
+                    "status": "approved",
+                    "thumbnail_crop_x": 162,
+                    "thumbnail_crop_y": 198,
+                    "thumbnail_crop_w": 542,
+                    "thumbnail_crop_h": 542,
+                    "url": "https://avatars.worldcubeassociation.org/uploads/user/avatar/2009GARC02/1448552195.jpg",
+                    "thumb_url": "https://avatars.worldcubeassociation.org/uploads/user/avatar/2009GARC02/1448552195_thumb.jpg",
+                    "is_default": false,
+                    "can_edit_thumbnail": false
+                }
+            }
+        ],
+        "organizers": [
+            {
+                "id": 37756,
+                "created_at": "2016-12-14T01:42:26.000Z",
+                "updated_at": "2025-06-14T00:15:30.000Z",
+                "name": "Ver\u00f3nica Fernanda Quezada Salazar",
+                "wca_id": "2013SALA07",
+                "gender": "f",
+                "country_iso2": "CL",
+                "url": "https://www.worldcubeassociation.org/persons/2013SALA07",
+                "country": {
+                    "id": "Chile",
+                    "name": "Chile",
+                    "continent_id": "_South America",
+                    "iso2": "CL"
+                },
+                "delegate_status": null,
+                "class": "user",
+                "teams": [],
+                "avatar": {
+                    "id": 6744,
+                    "status": "approved",
+                    "thumbnail_crop_x": 0,
+                    "thumbnail_crop_y": 68,
+                    "thumbnail_crop_w": 592,
+                    "thumbnail_crop_h": 592,
+                    "url": "https://avatars.worldcubeassociation.org/uploads/user/avatar/2013SALA07/1721227039.jpg",
+                    "thumb_url": "https://avatars.worldcubeassociation.org/uploads/user/avatar/2013SALA07/1721227039_thumb.jpg",
+                    "is_default": false,
+                    "can_edit_thumbnail": false
+                }
+            }
+        ],
+        "class": "competition"
+    },
+    {
         "id": "ColegioPabloGarrido2025",
         "name": "Colegio Pablo Garrido 2025",
         "venue": "[Colegio Pablo Garrido](https://www.colegio-pablogarrido.cl)",
@@ -24,13 +126,13 @@
         "event_ids": [
             "333"
         ],
-        "time_until_registration": "3 days",
+        "time_until_registration": "4 days",
         "date_range": "Jul 12, 2025",
         "delegates": [
             {
                 "id": 273,
                 "created_at": "2015-06-02T01:35:25.000Z",
-                "updated_at": "2025-06-05T00:16:19.000Z",
+                "updated_at": "2025-06-16T01:49:06.000Z",
                 "name": "Felipe Andres Rojas Garces",
                 "wca_id": "2009GARC02",
                 "gender": "m",
@@ -42,9 +144,9 @@
                     "continent_id": "_South America",
                     "iso2": "CL"
                 },
-                "delegate_status": "regional_delegate",
+                "delegate_status": "delegate",
                 "email": "fgarces@worldcubeassociation.org",
-                "location": null,
+                "location": "Chile (Santiago)",
                 "region_id": 51,
                 "class": "user",
                 "teams": [],
@@ -66,7 +168,7 @@
             {
                 "id": 273,
                 "created_at": "2015-06-02T01:35:25.000Z",
-                "updated_at": "2025-06-05T00:16:19.000Z",
+                "updated_at": "2025-06-16T01:49:06.000Z",
                 "name": "Felipe Andres Rojas Garces",
                 "wca_id": "2009GARC02",
                 "gender": "m",
@@ -78,9 +180,9 @@
                     "continent_id": "_South America",
                     "iso2": "CL"
                 },
-                "delegate_status": "regional_delegate",
+                "delegate_status": "delegate",
                 "email": "fgarces@worldcubeassociation.org",
-                "location": null,
+                "location": "Chile (Santiago)",
                 "region_id": 51,
                 "class": "user",
                 "teams": [],
@@ -129,13 +231,13 @@
             "minx",
             "sq1"
         ],
-        "time_until_registration": "1 day",
+        "time_until_registration": "8 days",
         "date_range": "Jul 5, 2025",
         "delegates": [
             {
                 "id": 33788,
                 "created_at": "2016-11-04T01:31:53.000Z",
-                "updated_at": "2025-06-05T18:11:01.000Z",
+                "updated_at": "2025-06-17T03:42:30.000Z",
                 "name": "Jos\u00e9 Antonio Gaete Rozas-Pe\u00f1a",
                 "wca_id": "2017GAET01",
                 "gender": "m",
@@ -169,7 +271,7 @@
             {
                 "id": 85452,
                 "created_at": "2017-12-14T04:36:31.000Z",
-                "updated_at": "2025-06-09T12:06:47.000Z",
+                "updated_at": "2025-06-15T01:24:22.000Z",
                 "name": "Axel Nicolas Romero Lucero",
                 "wca_id": "2019LUCE01",
                 "gender": "m",
@@ -202,7 +304,7 @@
             {
                 "id": 20759,
                 "created_at": "2016-06-06T03:25:55.000Z",
-                "updated_at": "2025-06-09T20:37:58.000Z",
+                "updated_at": "2025-06-17T04:21:45.000Z",
                 "name": "Ignacio Ortiz",
                 "wca_id": "2015ORTI02",
                 "gender": "m",
@@ -264,7 +366,7 @@
             {
                 "id": 85452,
                 "created_at": "2017-12-14T04:36:31.000Z",
-                "updated_at": "2025-06-09T12:06:47.000Z",
+                "updated_at": "2025-06-15T01:24:22.000Z",
                 "name": "Axel Nicolas Romero Lucero",
                 "wca_id": "2019LUCE01",
                 "gender": "m",
