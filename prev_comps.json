@@ -1,5 +1,143 @@
 [
     {
+        "id": "OHSaladOpen2025",
+        "name": "OH Salad Open 2025",
+        "venue": "[Oh Salad](https://www.ohsalad.cl/)",
+        "registration_open": "2025-09-06T00:00:00.000Z",
+        "registration_close": "2025-10-01T00:00:00.000Z",
+        "results_posted_at": null,
+        "announced_at": "2025-09-03T06:43:15.000Z",
+        "start_date": "2025-10-04",
+        "end_date": "2025-10-04",
+        "competitor_limit": 35,
+        "cancelled_at": null,
+        "url": "https://www.worldcubeassociation.org/competitions/OHSaladOpen2025",
+        "website": "https://www.worldcubeassociation.org/competitions/OHSaladOpen2025",
+        "short_name": "OH Salad Open 2025",
+        "short_display_name": "OH Salad Open 2025",
+        "city": "Las Condes, Santiago",
+        "venue_address": "Los militares 5890, Local 3, Las Condes, Santiago, Chile.",
+        "venue_details": "Inside the food shop",
+        "latitude_degrees": -33.405307,
+        "longitude_degrees": -70.570525,
+        "country_iso2": "CL",
+        "event_ids": [
+            "333",
+            "222",
+            "777",
+            "333bf",
+            "333oh",
+            "clock",
+            "pyram"
+        ],
+        "time_until_registration": "3 days",
+        "date_range": "Oct 4, 2025",
+        "delegates": [
+            {
+                "id": 65906,
+                "created_at": "2017-07-16T21:32:03.000Z",
+                "updated_at": "2025-09-03T03:38:16.000Z",
+                "name": "Maximiliano Perez Madrid",
+                "wca_id": "2017MADR01",
+                "gender": "m",
+                "country_iso2": "CL",
+                "url": "https://www.worldcubeassociation.org/persons/2017MADR01",
+                "country": {
+                    "id": "Chile",
+                    "name": "Chile",
+                    "continent_id": "_South America",
+                    "iso2": "CL"
+                },
+                "location": "Chile (Valpara\u00edso)",
+                "region_id": 51,
+                "delegate_status": "junior_delegate",
+                "email": "mmadrid@worldcubeassociation.org",
+                "class": "user",
+                "teams": [],
+                "avatar": {
+                    "id": 9418,
+                    "status": "approved",
+                    "thumbnail_crop_x": 132,
+                    "thumbnail_crop_y": 0,
+                    "thumbnail_crop_w": 270,
+                    "thumbnail_crop_h": 270,
+                    "url": "https://avatars.worldcubeassociation.org/uploads/user/avatar/2017MADR01/1694400372.jpg",
+                    "thumb_url": "https://avatars.worldcubeassociation.org/uploads/user/avatar/2017MADR01/1694400372_thumb.jpg",
+                    "is_default": false,
+                    "can_edit_thumbnail": false
+                }
+            }
+        ],
+        "organizers": [
+            {
+                "id": 65906,
+                "created_at": "2017-07-16T21:32:03.000Z",
+                "updated_at": "2025-09-03T03:38:16.000Z",
+                "name": "Maximiliano Perez Madrid",
+                "wca_id": "2017MADR01",
+                "gender": "m",
+                "country_iso2": "CL",
+                "url": "https://www.worldcubeassociation.org/persons/2017MADR01",
+                "country": {
+                    "id": "Chile",
+                    "name": "Chile",
+                    "continent_id": "_South America",
+                    "iso2": "CL"
+                },
+                "location": "Chile (Valpara\u00edso)",
+                "region_id": 51,
+                "delegate_status": "junior_delegate",
+                "email": "mmadrid@worldcubeassociation.org",
+                "class": "user",
+                "teams": [],
+                "avatar": {
+                    "id": 9418,
+                    "status": "approved",
+                    "thumbnail_crop_x": 132,
+                    "thumbnail_crop_y": 0,
+                    "thumbnail_crop_w": 270,
+                    "thumbnail_crop_h": 270,
+                    "url": "https://avatars.worldcubeassociation.org/uploads/user/avatar/2017MADR01/1694400372.jpg",
+                    "thumb_url": "https://avatars.worldcubeassociation.org/uploads/user/avatar/2017MADR01/1694400372_thumb.jpg",
+                    "is_default": false,
+                    "can_edit_thumbnail": false
+                }
+            },
+            {
+                "id": 268722,
+                "created_at": "2022-04-29T01:31:36.000Z",
+                "updated_at": "2025-09-02T11:37:20.000Z",
+                "name": "Dante Navarro Vera",
+                "wca_id": "2022VERA02",
+                "gender": "m",
+                "country_iso2": "CL",
+                "url": "https://www.worldcubeassociation.org/persons/2022VERA02",
+                "country": {
+                    "id": "Chile",
+                    "name": "Chile",
+                    "continent_id": "_South America",
+                    "iso2": "CL"
+                },
+                "delegate_status": null,
+                "class": "user",
+                "teams": [],
+                "avatar": {
+                    "id": 22506,
+                    "status": "approved",
+                    "thumbnail_crop_x": null,
+                    "thumbnail_crop_y": null,
+                    "thumbnail_crop_w": null,
+                    "thumbnail_crop_h": null,
+                    "url": "https://avatars.worldcubeassociation.org/uploads/user/avatar/2022VERA02/1696177797.jpg",
+                    "thumb_url": "https://avatars.worldcubeassociation.org/uploads/user/avatar/2022VERA02/1696177797_thumb.jpg",
+                    "is_default": false,
+                    "can_edit_thumbnail": false
+                }
+            }
+        ],
+        "class": "competition"
+    },
+    {
         "id": "VinaWinterOpen2025",
         "name": "Vi\u00f1a Winter Open 2025",
         "venue": "[Estadio Sausalito](https://maps.app.goo.gl/gByzDrueVjHnhG5s5)",
@@ -34,13 +172,13 @@
             "skewb",
             "sq1"
         ],
-        "time_until_registration": "3 days",
+        "time_until_registration": "about 1 month",
         "date_range": "Sep 6 - 7, 2025",
         "delegates": [
             {
                 "id": 65906,
                 "created_at": "2017-07-16T21:32:03.000Z",
-                "updated_at": "2025-07-31T14:45:24.000Z",
+                "updated_at": "2025-09-03T03:38:16.000Z",
                 "name": "Maximiliano Perez Madrid",
                 "wca_id": "2017MADR01",
                 "gender": "m",
@@ -74,7 +212,7 @@
             {
                 "id": 277295,
                 "created_at": "2022-06-05T14:25:00.000Z",
-                "updated_at": "2025-08-01T00:03:47.000Z",
+                "updated_at": "2025-09-01T16:18:26.000Z",
                 "name": "Alonso Josu\u00e9 Betach Fern\u00e1ndez Flores",
                 "wca_id": "2022FLOR05",
                 "gender": "m",
@@ -107,7 +245,7 @@
             {
                 "id": 57618,
                 "created_at": "2017-05-09T22:18:49.000Z",
-                "updated_at": "2025-08-01T04:37:46.000Z",
+                "updated_at": "2025-08-25T01:45:37.000Z",
                 "name": "Diego Alonso Tapia Mera",
                 "wca_id": "2017MERA01",
                 "gender": "m",
@@ -138,7 +276,7 @@
             {
                 "id": 96179,
                 "created_at": "2018-02-19T03:01:04.000Z",
-                "updated_at": "2025-08-01T06:39:58.000Z",
+                "updated_at": "2025-09-03T00:29:58.000Z",
                 "name": "Claudio Matias Cancino Bruna",
                 "wca_id": "2019BRUN02",
                 "gender": "m",
@@ -169,7 +307,7 @@
             {
                 "id": 119355,
                 "created_at": "2018-08-10T02:44:15.000Z",
-                "updated_at": "2025-07-31T22:46:12.000Z",
+                "updated_at": "2025-09-03T06:53:28.000Z",
                 "name": "Pedro Agust\u00edn Mora P\u00e9rez",
                 "wca_id": "2017PERE38",
                 "gender": "m",
