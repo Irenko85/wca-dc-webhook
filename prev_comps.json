@@ -1,5 +1,138 @@
 [
     {
+        "id": "TitanBigNMegaV22025",
+        "name": "Titan Big N Mega V2 2025",
+        "venue": "[Sala Cuna Girasol](https://salacunagirasol.cl/)",
+        "registration_open": "2025-09-15T03:01:00.000Z",
+        "registration_close": "2025-10-08T02:59:00.000Z",
+        "results_posted_at": null,
+        "announced_at": "2025-09-11T17:51:32.000Z",
+        "start_date": "2025-10-11",
+        "end_date": "2025-10-11",
+        "competitor_limit": 20,
+        "cancelled_at": null,
+        "url": "https://www.worldcubeassociation.org/competitions/TitanBigNMegaV22025",
+        "website": "https://www.worldcubeassociation.org/competitions/TitanBigNMegaV22025",
+        "short_name": "Titan Big N Mega V2 2025",
+        "short_display_name": "Titan Big N Mega V2 2025",
+        "city": "Santiago",
+        "venue_address": "Titan 5084, Santiago, Estaci\u00f3n Central, Regi\u00f3n Metropolitana, Chile",
+        "venue_details": "El campeonato se desarrollar\u00e1 en el segundo piso.",
+        "latitude_degrees": -33.459428,
+        "longitude_degrees": -70.705116,
+        "country_iso2": "CL",
+        "event_ids": [
+            "444",
+            "555",
+            "666",
+            "777",
+            "minx"
+        ],
+        "time_until_registration": "3 days",
+        "date_range": "Oct 11, 2025",
+        "delegates": [
+            {
+                "id": 273,
+                "created_at": "2015-06-02T01:35:25.000Z",
+                "updated_at": "2025-09-10T21:05:53.000Z",
+                "name": "Felipe Andres Rojas Garces",
+                "wca_id": "2009GARC02",
+                "gender": "m",
+                "country_iso2": "CL",
+                "url": "https://www.worldcubeassociation.org/persons/2009GARC02",
+                "country": {
+                    "id": "Chile",
+                    "name": "Chile",
+                    "continent_id": "_South America",
+                    "iso2": "CL"
+                },
+                "location": "Chile (Santiago)",
+                "region_id": 51,
+                "delegate_status": "delegate",
+                "email": "fgarces@worldcubeassociation.org",
+                "class": "user",
+                "teams": [],
+                "avatar": {
+                    "id": 119,
+                    "status": "approved",
+                    "thumbnail_crop_x": 162,
+                    "thumbnail_crop_y": 198,
+                    "thumbnail_crop_w": 542,
+                    "thumbnail_crop_h": 542,
+                    "url": "https://avatars.worldcubeassociation.org/uploads/user/avatar/2009GARC02/1448552195.jpg",
+                    "thumb_url": "https://avatars.worldcubeassociation.org/uploads/user/avatar/2009GARC02/1448552195_thumb.jpg",
+                    "is_default": false,
+                    "can_edit_thumbnail": false
+                }
+            }
+        ],
+        "organizers": [
+            {
+                "id": 96179,
+                "created_at": "2018-02-19T03:01:04.000Z",
+                "updated_at": "2025-09-11T14:46:22.000Z",
+                "name": "Claudio Matias Cancino Bruna",
+                "wca_id": "2019BRUN02",
+                "gender": "m",
+                "country_iso2": "CL",
+                "url": "https://www.worldcubeassociation.org/persons/2019BRUN02",
+                "country": {
+                    "id": "Chile",
+                    "name": "Chile",
+                    "continent_id": "_South America",
+                    "iso2": "CL"
+                },
+                "delegate_status": null,
+                "class": "user",
+                "teams": [],
+                "avatar": {
+                    "id": 76085,
+                    "status": "approved",
+                    "thumbnail_crop_x": 0,
+                    "thumbnail_crop_y": 172,
+                    "thumbnail_crop_w": 1080,
+                    "thumbnail_crop_h": 1080,
+                    "url": "https://avatars.worldcubeassociation.org/oxmy9cn4q171v9s9h47cde7j1nk8",
+                    "thumb_url": "https://avatars.worldcubeassociation.org/mjfeevrb7etc64zcd2a6xx1tous8",
+                    "is_default": false,
+                    "can_edit_thumbnail": true
+                }
+            },
+            {
+                "id": 268722,
+                "created_at": "2022-04-29T01:31:36.000Z",
+                "updated_at": "2025-09-11T14:25:49.000Z",
+                "name": "Dante Navarro Vera",
+                "wca_id": "2022VERA02",
+                "gender": "m",
+                "country_iso2": "CL",
+                "url": "https://www.worldcubeassociation.org/persons/2022VERA02",
+                "country": {
+                    "id": "Chile",
+                    "name": "Chile",
+                    "continent_id": "_South America",
+                    "iso2": "CL"
+                },
+                "delegate_status": null,
+                "class": "user",
+                "teams": [],
+                "avatar": {
+                    "id": 22506,
+                    "status": "approved",
+                    "thumbnail_crop_x": null,
+                    "thumbnail_crop_y": null,
+                    "thumbnail_crop_w": null,
+                    "thumbnail_crop_h": null,
+                    "url": "https://avatars.worldcubeassociation.org/uploads/user/avatar/2022VERA02/1696177797.jpg",
+                    "thumb_url": "https://avatars.worldcubeassociation.org/uploads/user/avatar/2022VERA02/1696177797_thumb.jpg",
+                    "is_default": false,
+                    "can_edit_thumbnail": false
+                }
+            }
+        ],
+        "class": "competition"
+    },
+    {
         "id": "OHSaladOpen2025",
         "name": "OH Salad Open 2025",
         "venue": "[Oh Salad](https://www.ohsalad.cl/)",
@@ -30,13 +163,13 @@
             "clock",
             "pyram"
         ],
-        "time_until_registration": "3 days",
+        "time_until_registration": "6 days",
         "date_range": "Oct 4, 2025",
         "delegates": [
             {
                 "id": 65906,
                 "created_at": "2017-07-16T21:32:03.000Z",
-                "updated_at": "2025-09-03T03:38:16.000Z",
+                "updated_at": "2025-09-10T01:33:31.000Z",
                 "name": "Maximiliano Perez Madrid",
                 "wca_id": "2017MADR01",
                 "gender": "m",
@@ -72,7 +205,7 @@
             {
                 "id": 65906,
                 "created_at": "2017-07-16T21:32:03.000Z",
-                "updated_at": "2025-09-03T03:38:16.000Z",
+                "updated_at": "2025-09-10T01:33:31.000Z",
                 "name": "Maximiliano Perez Madrid",
                 "wca_id": "2017MADR01",
                 "gender": "m",
@@ -106,7 +239,7 @@
             {
                 "id": 268722,
                 "created_at": "2022-04-29T01:31:36.000Z",
-                "updated_at": "2025-09-02T11:37:20.000Z",
+                "updated_at": "2025-09-11T14:25:49.000Z",
                 "name": "Dante Navarro Vera",
                 "wca_id": "2022VERA02",
                 "gender": "m",
