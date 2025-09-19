@@ -1,5 +1,139 @@
 [
     {
+        "id": "UFROalCubo2025",
+        "name": "UFRO al Cubo 2025",
+        "venue": "[Universidad De La Frontera](https://maps.app.goo.gl/pbUEaJTM2Z7EWQeG8)",
+        "registration_open": "2025-09-22T00:00:00.000Z",
+        "registration_close": "2025-10-18T00:00:00.000Z",
+        "results_posted_at": null,
+        "announced_at": "2025-09-19T05:49:17.000Z",
+        "start_date": "2025-10-25",
+        "end_date": "2025-10-25",
+        "competitor_limit": 45,
+        "cancelled_at": null,
+        "url": "https://www.worldcubeassociation.org/competitions/UFROalCubo2025",
+        "website": "https://www.worldcubeassociation.org/competitions/UFROalCubo2025",
+        "short_name": "UFRO al Cubo 2025",
+        "short_display_name": "UFRO al Cubo 2025",
+        "city": "Temuco",
+        "venue_address": "Uruguay 1720, Temuco, Araucan\u00eda",
+        "venue_details": "Aula Magna UFRO, sala 101",
+        "latitude_degrees": -38.745653,
+        "longitude_degrees": -72.618355,
+        "country_iso2": "CL",
+        "event_ids": [
+            "333",
+            "222",
+            "444",
+            "minx",
+            "pyram",
+            "skewb"
+        ],
+        "time_until_registration": "3 days",
+        "date_range": "Oct 25, 2025",
+        "delegates": [
+            {
+                "id": 65906,
+                "created_at": "2017-07-16T21:32:03.000Z",
+                "updated_at": "2025-09-19T00:45:24.000Z",
+                "name": "Maximiliano Perez Madrid",
+                "wca_id": "2017MADR01",
+                "gender": "m",
+                "country_iso2": "CL",
+                "url": "https://www.worldcubeassociation.org/persons/2017MADR01",
+                "country": {
+                    "id": "Chile",
+                    "name": "Chile",
+                    "continent_id": "_South America",
+                    "iso2": "CL"
+                },
+                "location": "Chile (Valpara\u00edso)",
+                "region_id": 51,
+                "delegate_status": "junior_delegate",
+                "email": "mmadrid@worldcubeassociation.org",
+                "class": "user",
+                "teams": [],
+                "avatar": {
+                    "id": 9418,
+                    "status": "approved",
+                    "thumbnail_crop_x": 132,
+                    "thumbnail_crop_y": 0,
+                    "thumbnail_crop_w": 270,
+                    "thumbnail_crop_h": 270,
+                    "url": "https://avatars.worldcubeassociation.org/uploads/user/avatar/2017MADR01/1694400372.jpg",
+                    "thumb_url": "https://avatars.worldcubeassociation.org/uploads/user/avatar/2017MADR01/1694400372_thumb.jpg",
+                    "is_default": false,
+                    "can_edit_thumbnail": false
+                }
+            }
+        ],
+        "organizers": [
+            {
+                "id": 119355,
+                "created_at": "2018-08-10T02:44:15.000Z",
+                "updated_at": "2025-09-19T04:31:49.000Z",
+                "name": "Pedro Agust\u00edn Mora P\u00e9rez",
+                "wca_id": "2017PERE38",
+                "gender": "m",
+                "country_iso2": "CL",
+                "url": "https://www.worldcubeassociation.org/persons/2017PERE38",
+                "country": {
+                    "id": "Chile",
+                    "name": "Chile",
+                    "continent_id": "_South America",
+                    "iso2": "CL"
+                },
+                "delegate_status": null,
+                "class": "user",
+                "teams": [],
+                "avatar": {
+                    "id": 79182,
+                    "status": "approved",
+                    "thumbnail_crop_x": 154,
+                    "thumbnail_crop_y": 0,
+                    "thumbnail_crop_w": 860,
+                    "thumbnail_crop_h": 861,
+                    "url": "https://avatars.worldcubeassociation.org/l7e5bu6eckivxdln8mwnk0uwsu3i",
+                    "thumb_url": "https://avatars.worldcubeassociation.org/lrj7qm277rtox7sj9oq4e0bmm8ti",
+                    "is_default": false,
+                    "can_edit_thumbnail": true
+                }
+            },
+            {
+                "id": 154227,
+                "created_at": "2019-04-20T19:07:15.000Z",
+                "updated_at": "2025-04-03T17:52:01.000Z",
+                "name": "Michael Fonseca",
+                "wca_id": "2019FONS06",
+                "gender": "m",
+                "country_iso2": "CL",
+                "url": "https://www.worldcubeassociation.org/persons/2019FONS06",
+                "country": {
+                    "id": "Chile",
+                    "name": "Chile",
+                    "continent_id": "_South America",
+                    "iso2": "CL"
+                },
+                "delegate_status": null,
+                "class": "user",
+                "teams": [],
+                "avatar": {
+                    "id": 71948,
+                    "status": "approved",
+                    "thumbnail_crop_x": 96,
+                    "thumbnail_crop_y": 208,
+                    "thumbnail_crop_w": 599,
+                    "thumbnail_crop_h": 599,
+                    "url": "https://avatars.worldcubeassociation.org/ios7f41hexnz9tbp417sgzk5fpu4",
+                    "thumb_url": "https://avatars.worldcubeassociation.org/ko17xubzba9mzal44znok9d8gky3",
+                    "is_default": false,
+                    "can_edit_thumbnail": true
+                }
+            }
+        ],
+        "class": "competition"
+    },
+    {
         "id": "TitanBigNMegaV22025",
         "name": "Titan Big N Mega V2 2025",
         "venue": "[Sala Cuna Girasol](https://salacunagirasol.cl/)",
@@ -28,13 +162,13 @@
             "777",
             "minx"
         ],
-        "time_until_registration": "3 days",
+        "time_until_registration": "4 days",
         "date_range": "Oct 11, 2025",
         "delegates": [
             {
                 "id": 273,
                 "created_at": "2015-06-02T01:35:25.000Z",
-                "updated_at": "2025-09-10T21:05:53.000Z",
+                "updated_at": "2025-09-16T21:28:55.000Z",
                 "name": "Felipe Andres Rojas Garces",
                 "wca_id": "2009GARC02",
                 "gender": "m",
@@ -70,7 +204,7 @@
             {
                 "id": 96179,
                 "created_at": "2018-02-19T03:01:04.000Z",
-                "updated_at": "2025-09-11T14:46:22.000Z",
+                "updated_at": "2025-09-19T04:50:19.000Z",
                 "name": "Claudio Matias Cancino Bruna",
                 "wca_id": "2019BRUN02",
                 "gender": "m",
@@ -101,7 +235,7 @@
             {
                 "id": 268722,
                 "created_at": "2022-04-29T01:31:36.000Z",
-                "updated_at": "2025-09-11T14:25:49.000Z",
+                "updated_at": "2025-09-19T01:27:56.000Z",
                 "name": "Dante Navarro Vera",
                 "wca_id": "2022VERA02",
                 "gender": "m",
@@ -137,7 +271,7 @@
         "name": "OH Salad Open 2025",
         "venue": "[Oh Salad](https://www.ohsalad.cl/)",
         "registration_open": "2025-09-06T00:00:00.000Z",
-        "registration_close": "2025-10-01T00:00:00.000Z",
+        "registration_close": "2025-09-12T02:09:33.000Z",
         "results_posted_at": null,
         "announced_at": "2025-09-03T06:43:15.000Z",
         "start_date": "2025-10-04",
@@ -163,13 +297,13 @@
             "clock",
             "pyram"
         ],
-        "time_until_registration": "6 days",
+        "time_until_registration": "13 days",
         "date_range": "Oct 4, 2025",
         "delegates": [
             {
                 "id": 65906,
                 "created_at": "2017-07-16T21:32:03.000Z",
-                "updated_at": "2025-09-10T01:33:31.000Z",
+                "updated_at": "2025-09-19T00:45:24.000Z",
                 "name": "Maximiliano Perez Madrid",
                 "wca_id": "2017MADR01",
                 "gender": "m",
@@ -203,9 +337,40 @@
         ],
         "organizers": [
             {
+                "id": 57618,
+                "created_at": "2017-05-09T22:18:49.000Z",
+                "updated_at": "2025-09-12T15:56:39.000Z",
+                "name": "Diego Alonso Tapia Mera",
+                "wca_id": "2017MERA01",
+                "gender": "m",
+                "country_iso2": "CL",
+                "url": "https://www.worldcubeassociation.org/persons/2017MERA01",
+                "country": {
+                    "id": "Chile",
+                    "name": "Chile",
+                    "continent_id": "_South America",
+                    "iso2": "CL"
+                },
+                "delegate_status": null,
+                "class": "user",
+                "teams": [],
+                "avatar": {
+                    "id": 71988,
+                    "status": "approved",
+                    "thumbnail_crop_x": 361,
+                    "thumbnail_crop_y": 350,
+                    "thumbnail_crop_w": 356,
+                    "thumbnail_crop_h": 356,
+                    "url": "https://avatars.worldcubeassociation.org/drkddaqui6qsem5mt1jv4hcz0dry",
+                    "thumb_url": "https://avatars.worldcubeassociation.org/1lo9q0vz80tig3pqtwbzqpnm910y",
+                    "is_default": false,
+                    "can_edit_thumbnail": true
+                }
+            },
+            {
                 "id": 65906,
                 "created_at": "2017-07-16T21:32:03.000Z",
-                "updated_at": "2025-09-10T01:33:31.000Z",
+                "updated_at": "2025-09-19T00:45:24.000Z",
                 "name": "Maximiliano Perez Madrid",
                 "wca_id": "2017MADR01",
                 "gender": "m",
@@ -239,7 +404,7 @@
             {
                 "id": 268722,
                 "created_at": "2022-04-29T01:31:36.000Z",
-                "updated_at": "2025-09-11T14:25:49.000Z",
+                "updated_at": "2025-09-19T01:27:56.000Z",
                 "name": "Dante Navarro Vera",
                 "wca_id": "2022VERA02",
                 "gender": "m",
@@ -263,6 +428,37 @@
                     "thumbnail_crop_h": null,
                     "url": "https://avatars.worldcubeassociation.org/uploads/user/avatar/2022VERA02/1696177797.jpg",
                     "thumb_url": "https://avatars.worldcubeassociation.org/uploads/user/avatar/2022VERA02/1696177797_thumb.jpg",
+                    "is_default": false,
+                    "can_edit_thumbnail": false
+                }
+            },
+            {
+                "id": 278687,
+                "created_at": "2022-06-10T19:36:04.000Z",
+                "updated_at": "2025-09-17T04:23:21.000Z",
+                "name": "Victor Alejandro Meza Maturana",
+                "wca_id": "2022MATU05",
+                "gender": "m",
+                "country_iso2": "CL",
+                "url": "https://www.worldcubeassociation.org/persons/2022MATU05",
+                "country": {
+                    "id": "Chile",
+                    "name": "Chile",
+                    "continent_id": "_South America",
+                    "iso2": "CL"
+                },
+                "delegate_status": null,
+                "class": "user",
+                "teams": [],
+                "avatar": {
+                    "id": 23284,
+                    "status": "approved",
+                    "thumbnail_crop_x": null,
+                    "thumbnail_crop_y": null,
+                    "thumbnail_crop_w": null,
+                    "thumbnail_crop_h": null,
+                    "url": "https://avatars.worldcubeassociation.org/uploads/user/avatar/2022MATU05/1723121251.jpg",
+                    "thumb_url": "https://avatars.worldcubeassociation.org/uploads/user/avatar/2022MATU05/1723121251_thumb.jpg",
                     "is_default": false,
                     "can_edit_thumbnail": false
                 }
