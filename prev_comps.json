@@ -33,13 +33,13 @@
             "pyram",
             "sq1"
         ],
-        "time_until_registration": "2 days",
+        "time_until_registration": "1 day",
         "date_range": "Jan 24 - 25, 2026",
         "delegates": [
             {
                 "id": 85452,
                 "created_at": "2017-12-14T04:36:31.000Z",
-                "updated_at": "2025-11-22T22:00:22.000Z",
+                "updated_at": "2025-12-03T12:04:42.000Z",
                 "name": "Axel Nicolas Romero Lucero",
                 "wca_id": "2019LUCE01",
                 "gender": "m",
@@ -73,7 +73,7 @@
             {
                 "id": 277295,
                 "created_at": "2022-06-05T14:25:00.000Z",
-                "updated_at": "2025-11-29T15:10:37.000Z",
+                "updated_at": "2025-12-01T13:18:29.000Z",
                 "name": "Alonso Josu\u00e9 Betach Fern\u00e1ndez Flores",
                 "wca_id": "2022FLOR05",
                 "gender": "m",
@@ -106,7 +106,7 @@
             {
                 "id": 51836,
                 "created_at": "2017-03-27T00:46:25.000Z",
-                "updated_at": "2025-11-29T02:45:46.000Z",
+                "updated_at": "2025-12-03T15:29:20.000Z",
                 "name": "Diego N\u00fa\u00f1ez",
                 "wca_id": "2017NUNE05",
                 "gender": "m",
@@ -128,8 +128,8 @@
                     "thumbnail_crop_y": 0,
                     "thumbnail_crop_w": 100,
                     "thumbnail_crop_h": 100,
-                    "url": "https://assets.worldcubeassociation.org/assets/909ba4f/assets/missing_avatar_thumb-d77f478a307a91a9d4a083ad197012a391d5410f6dd26cb0b0e3118a5de71438.png",
-                    "thumb_url": "https://assets.worldcubeassociation.org/assets/909ba4f/assets/missing_avatar_thumb-d77f478a307a91a9d4a083ad197012a391d5410f6dd26cb0b0e3118a5de71438.png",
+                    "url": "https://assets.worldcubeassociation.org/assets/7c40916/assets/missing_avatar_thumb-d77f478a307a91a9d4a083ad197012a391d5410f6dd26cb0b0e3118a5de71438.png",
+                    "thumb_url": "https://assets.worldcubeassociation.org/assets/7c40916/assets/missing_avatar_thumb-d77f478a307a91a9d4a083ad197012a391d5410f6dd26cb0b0e3118a5de71438.png",
                     "is_default": true,
                     "can_edit_thumbnail": false
                 }
@@ -168,7 +168,7 @@
             {
                 "id": 96179,
                 "created_at": "2018-02-19T03:01:04.000Z",
-                "updated_at": "2025-12-01T00:33:43.000Z",
+                "updated_at": "2025-12-04T02:25:42.000Z",
                 "name": "Claudio Matias Cancino Bruna",
                 "wca_id": "2019BRUN02",
                 "gender": "m",
@@ -199,7 +199,7 @@
             {
                 "id": 104517,
                 "created_at": "2018-04-07T17:18:03.000Z",
-                "updated_at": "2025-11-30T23:03:44.000Z",
+                "updated_at": "2025-12-02T18:38:23.000Z",
                 "name": "Jose Basaes",
                 "wca_id": "2018BASA03",
                 "gender": "m",
@@ -230,7 +230,7 @@
             {
                 "id": 119355,
                 "created_at": "2018-08-10T02:44:15.000Z",
-                "updated_at": "2025-12-01T01:01:17.000Z",
+                "updated_at": "2025-12-04T06:15:57.000Z",
                 "name": "Pedro Agust\u00edn Mora P\u00e9rez",
                 "wca_id": "2017PERE38",
                 "gender": "m",
@@ -256,6 +256,173 @@
                     "thumb_url": "https://avatars.worldcubeassociation.org/lrj7qm277rtox7sj9oq4e0bmm8ti",
                     "is_default": false,
                     "can_edit_thumbnail": true
+                }
+            }
+        ],
+        "class": "competition"
+    },
+    {
+        "id": "CubiTome2026",
+        "name": "CubiTom\u00e9 2026",
+        "venue": "Liceo Rep\u00fablica del Ecuador",
+        "registration_open": "2025-12-07T00:00:00.000Z",
+        "registration_close": "2026-01-06T00:00:00.000Z",
+        "results_posted_at": null,
+        "announced_at": "2025-12-04T06:12:32.000Z",
+        "start_date": "2026-01-10",
+        "end_date": "2026-01-10",
+        "competitor_limit": 50,
+        "cancelled_at": null,
+        "url": "https://www.worldcubeassociation.org/competitions/CubiTome2026",
+        "website": "https://www.worldcubeassociation.org/competitions/CubiTome2026",
+        "short_name": "CubiTom\u00e9 2026",
+        "short_display_name": "CubiTom\u00e9 2026",
+        "city": "Tom\u00e9",
+        "venue_address": "An\u00edbal Pinto 1210, Tom\u00e9, B\u00edo B\u00edo",
+        "venue_details": "Gimnasio del Liceo",
+        "latitude_degrees": -36.616058,
+        "longitude_degrees": -72.953172,
+        "country_iso2": "CL",
+        "event_ids": [
+            "333",
+            "555",
+            "333oh",
+            "pyram",
+            "sq1"
+        ],
+        "time_until_registration": "3 days",
+        "date_range": "Jan 10, 2026",
+        "delegates": [
+            {
+                "id": 273,
+                "created_at": "2015-06-02T01:35:25.000Z",
+                "updated_at": "2025-12-03T03:04:47.000Z",
+                "name": "Felipe Andres Rojas Garces",
+                "wca_id": "2009GARC02",
+                "gender": "m",
+                "country_iso2": "CL",
+                "url": "https://www.worldcubeassociation.org/persons/2009GARC02",
+                "country": {
+                    "id": "Chile",
+                    "name": "Chile",
+                    "continent_id": "_South America",
+                    "iso2": "CL"
+                },
+                "location": "Chile (Santiago)",
+                "region_id": 51,
+                "delegate_status": "delegate",
+                "email": "fgarces@worldcubeassociation.org",
+                "class": "user",
+                "teams": [],
+                "avatar": {
+                    "id": 119,
+                    "status": "approved",
+                    "thumbnail_crop_x": 162,
+                    "thumbnail_crop_y": 198,
+                    "thumbnail_crop_w": 542,
+                    "thumbnail_crop_h": 542,
+                    "url": "https://avatars.worldcubeassociation.org/uploads/user/avatar/2009GARC02/1448552195.jpg",
+                    "thumb_url": "https://avatars.worldcubeassociation.org/uploads/user/avatar/2009GARC02/1448552195_thumb.jpg",
+                    "is_default": false,
+                    "can_edit_thumbnail": false
+                }
+            },
+            {
+                "id": 85452,
+                "created_at": "2017-12-14T04:36:31.000Z",
+                "updated_at": "2025-12-03T12:04:42.000Z",
+                "name": "Axel Nicolas Romero Lucero",
+                "wca_id": "2019LUCE01",
+                "gender": "m",
+                "country_iso2": "CL",
+                "url": "https://www.worldcubeassociation.org/persons/2019LUCE01",
+                "country": {
+                    "id": "Chile",
+                    "name": "Chile",
+                    "continent_id": "_South America",
+                    "iso2": "CL"
+                },
+                "location": "Chile (Concepci\u00f3n)",
+                "region_id": 51,
+                "delegate_status": "junior_delegate",
+                "email": "alucero@worldcubeassociation.org",
+                "class": "user",
+                "teams": [],
+                "avatar": {
+                    "id": 11186,
+                    "status": "approved",
+                    "thumbnail_crop_x": null,
+                    "thumbnail_crop_y": null,
+                    "thumbnail_crop_w": null,
+                    "thumbnail_crop_h": null,
+                    "url": "https://avatars.worldcubeassociation.org/uploads/user/avatar/2019LUCE01/1722264313.png",
+                    "thumb_url": "https://avatars.worldcubeassociation.org/uploads/user/avatar/2019LUCE01/1722264313_thumb.png",
+                    "is_default": false,
+                    "can_edit_thumbnail": false
+                }
+            }
+        ],
+        "organizers": [
+            {
+                "id": 20759,
+                "created_at": "2016-06-06T03:25:55.000Z",
+                "updated_at": "2025-12-04T01:50:02.000Z",
+                "name": "Ignacio Ortiz",
+                "wca_id": "2015ORTI02",
+                "gender": "m",
+                "country_iso2": "CL",
+                "url": "https://www.worldcubeassociation.org/persons/2015ORTI02",
+                "country": {
+                    "id": "Chile",
+                    "name": "Chile",
+                    "continent_id": "_South America",
+                    "iso2": "CL"
+                },
+                "delegate_status": null,
+                "class": "user",
+                "teams": [],
+                "avatar": {
+                    "id": 4786,
+                    "status": "approved",
+                    "thumbnail_crop_x": null,
+                    "thumbnail_crop_y": null,
+                    "thumbnail_crop_w": null,
+                    "thumbnail_crop_h": null,
+                    "url": "https://avatars.worldcubeassociation.org/uploads/user/avatar/2015ORTI02/1718482558.jpg",
+                    "thumb_url": "https://avatars.worldcubeassociation.org/uploads/user/avatar/2015ORTI02/1718482558_thumb.jpg",
+                    "is_default": false,
+                    "can_edit_thumbnail": false
+                }
+            },
+            {
+                "id": 39831,
+                "created_at": "2017-01-04T15:27:09.000Z",
+                "updated_at": "2025-12-02T22:13:00.000Z",
+                "name": "Felipe Ignacio Bastidas Lopez",
+                "wca_id": "2017LOPE04",
+                "gender": "m",
+                "country_iso2": "CL",
+                "url": "https://www.worldcubeassociation.org/persons/2017LOPE04",
+                "country": {
+                    "id": "Chile",
+                    "name": "Chile",
+                    "continent_id": "_South America",
+                    "iso2": "CL"
+                },
+                "delegate_status": null,
+                "class": "user",
+                "teams": [],
+                "avatar": {
+                    "id": 6974,
+                    "status": "approved",
+                    "thumbnail_crop_x": 0,
+                    "thumbnail_crop_y": 0,
+                    "thumbnail_crop_w": 600,
+                    "thumbnail_crop_h": 600,
+                    "url": "https://avatars.worldcubeassociation.org/uploads/user/avatar/2017LOPE04/1705851199.jpeg",
+                    "thumb_url": "https://avatars.worldcubeassociation.org/uploads/user/avatar/2017LOPE04/1705851199_thumb.jpeg",
+                    "is_default": false,
+                    "can_edit_thumbnail": false
                 }
             }
         ],
@@ -291,7 +458,7 @@
             "minx",
             "pyram"
         ],
-        "time_until_registration": "10 days",
+        "time_until_registration": "13 days",
         "date_range": "Dec 20, 2025",
         "delegates": [
             {
@@ -331,7 +498,7 @@
             {
                 "id": 85452,
                 "created_at": "2017-12-14T04:36:31.000Z",
-                "updated_at": "2025-11-22T22:00:22.000Z",
+                "updated_at": "2025-12-03T12:04:42.000Z",
                 "name": "Axel Nicolas Romero Lucero",
                 "wca_id": "2019LUCE01",
                 "gender": "m",
@@ -365,7 +532,7 @@
             {
                 "id": 277295,
                 "created_at": "2022-06-05T14:25:00.000Z",
-                "updated_at": "2025-11-29T15:10:37.000Z",
+                "updated_at": "2025-12-01T13:18:29.000Z",
                 "name": "Alonso Josu\u00e9 Betach Fern\u00e1ndez Flores",
                 "wca_id": "2022FLOR05",
                 "gender": "m",
@@ -398,7 +565,7 @@
             {
                 "id": 39831,
                 "created_at": "2017-01-04T15:27:09.000Z",
-                "updated_at": "2025-11-30T22:59:21.000Z",
+                "updated_at": "2025-12-02T22:13:00.000Z",
                 "name": "Felipe Ignacio Bastidas Lopez",
                 "wca_id": "2017LOPE04",
                 "gender": "m",
@@ -429,7 +596,7 @@
             {
                 "id": 119355,
                 "created_at": "2018-08-10T02:44:15.000Z",
-                "updated_at": "2025-12-01T01:01:17.000Z",
+                "updated_at": "2025-12-04T06:15:57.000Z",
                 "name": "Pedro Agust\u00edn Mora P\u00e9rez",
                 "wca_id": "2017PERE38",
                 "gender": "m",
