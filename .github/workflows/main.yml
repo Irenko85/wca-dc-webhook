@@ -2,7 +2,7 @@ name: Run script
 
 on:
   schedule:
-    - cron: "0 */2 * * *"  # Ejecutar cada 2 horas
+    - cron: "0 * * * *"  # Ejecutar cada 1 hora
   workflow_dispatch:
 
 jobs:
@@ -30,15 +30,15 @@ jobs:
           TELEGRAM_CHANNEL_ID: ${{ secrets.TELEGRAM_CHANNEL_ID }}
         run: python main.py
 
-      - name: Commit and push if prev_comps.json changed
+      - name: Commit and push if data files changed
         run: |
           git config --global user.name "github-actions"
           git config --global user.email "github-actions@github.com"
-          git add prev_comps.json
+          git add prev_comps.json registration_tracking.json
           if git diff --cached --quiet; then
-            echo "✅ No changes in prev_comps.json"
+            echo "✅ No changes in data files"
           else
-            git commit -m "update prev_comps.json"
+            git commit -m "update competition data"
             git push origin main
-            echo "✅ prev_comps.json updated"
+            echo "✅ Data files updated"
           fi
