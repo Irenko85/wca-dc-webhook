@@ -36,8 +36,10 @@ TELEGRAM_CHANNEL_ID = check_env_var("TELEGRAM_CHANNEL_ID")
 
 # Constants
 PREV_COMPS_FILE = Path("prev_comps.json")
+REGISTRATION_TRACKING_FILE = Path("registration_tracking.json")
 DEFAULT_COUNTRY = "CL"  # Chile as default country
 REQUEST_TIMEOUT = 10  # seconds
+REGISTRATION_UPCOMING_WINDOW = 60  # minutes before registration opens to send "upcoming" notification
 
 # Dictionary for competition event categories
 EVENTS = {
@@ -179,6 +181,198 @@ def detect_new_competitions(
     previous_ids = {comp["id"] for comp in previous_comps}
     new_comps = [comp for comp in current_comps if comp["id"] not in previous_ids]
     return new_comps
+
+
+def initialize_registration_tracking_file() -> None:
+    """Ensure registration_tracking.json exists with valid JSON content."""
+    try:
+        if not REGISTRATION_TRACKING_FILE.exists():
+            logger.info(f"Creating empty {REGISTRATION_TRACKING_FILE}")
+            REGISTRATION_TRACKING_FILE.write_text("{}")
+        else:
+            # Validate JSON
+            with open(REGISTRATION_TRACKING_FILE, "r") as file:
+                json.load(file)
+    except json.JSONDecodeError:
+        logger.error(
+            f"Invalid JSON in {REGISTRATION_TRACKING_FILE}. Creating new empty file."
+        )
+        REGISTRATION_TRACKING_FILE.write_text("{}")
+    except Exception as e:
+        logger.error(f"Error initializing registration tracking file: {e}")
+
+
+def load_registration_tracking() -> Dict[str, Dict[str, bool]]:
+    """Load registration notification tracking data.
+
+    Returns:
+        Dictionary mapping comp_id to tracking data:
+        {
+            "CompID123": {
+                "notified_upcoming": True,
+                "notified_open": False
+            }
+        }
+    """
+    try:
+        with open(REGISTRATION_TRACKING_FILE, "r") as file:
+            return json.load(file)
+    except (json.JSONDecodeError, FileNotFoundError) as e:
+        logger.error(f"Error reading {REGISTRATION_TRACKING_FILE}: {e}")
+        initialize_registration_tracking_file()
+        return {}
+
+
+def save_registration_tracking(tracking_data: Dict[str, Dict[str, bool]]) -> None:
+    """Save registration notification tracking data."""
+    try:
+        with open(REGISTRATION_TRACKING_FILE, "w") as file:
+            json.dump(tracking_data, file, indent=4)
+        logger.info(f"Updated {REGISTRATION_TRACKING_FILE}")
+    except Exception as e:
+        logger.error(f"Error saving registration tracking: {e}")
+
+
+def clean_old_registration_tracking() -> int:
+    """Remove tracking entries for competitions that have already started.
+
+    Returns:
+        Number of entries removed
+    """
+    today = datetime.datetime.now().date()
+    tracking = load_registration_tracking()
+    comps = load_previous_competitions()
+
+    # Create a set of IDs for competitions that haven't started yet
+    future_comp_ids = {
+        comp["id"]
+        for comp in comps
+        if datetime.datetime.strptime(comp["start_date"], "%Y-%m-%d").date() > today
+    }
+
+    # Filter tracking to only include future competitions
+    new_tracking = {
+        comp_id: data
+        for comp_id, data in tracking.items()
+        if comp_id in future_comp_ids
+    }
+
+    removed_count = len(tracking) - len(new_tracking)
+
+    if removed_count > 0:
+        save_registration_tracking(new_tracking)
+        logger.info(
+            f"Removed {removed_count} old entries from registration tracking"
+        )
+    else:
+        logger.info("No old registration tracking entries to remove")
+
+    return removed_count
+
+
+def detect_registration_opening_soon(
+    competitions: List[Dict[str, Any]], tracking: Dict[str, Dict[str, bool]]
+) -> List[Dict[str, Any]]:
+    """Detect competitions whose registration is opening soon (within the next hour).
+
+    Args:
+        competitions: List of competition dictionaries
+        tracking: Registration tracking data
+
+    Returns:
+        List of competitions with registration opening soon that haven't been notified
+    """
+    now = datetime.datetime.now(datetime.timezone.utc)
+    opening_soon = []
+
+    for comp in competitions:
+        comp_id = comp["id"]
+
+        # Skip if already notified about upcoming registration
+        if tracking.get(comp_id, {}).get("notified_upcoming", False):
+            continue
+
+        # Skip if competition has already started
+        start_date = datetime.datetime.strptime(comp["start_date"], "%Y-%m-%d").date()
+        if start_date <= datetime.datetime.now().date():
+            continue
+
+        # Check if registration_open exists and is in the future
+        if not comp.get("registration_open"):
+            continue
+
+        try:
+            reg_open = datetime.datetime.strptime(
+                comp["registration_open"], "%Y-%m-%dT%H:%M:%S.%fZ"
+            ).replace(tzinfo=datetime.timezone.utc)
+
+            # Check if registration opens within the next REGISTRATION_UPCOMING_WINDOW minutes
+            time_until_open = (reg_open - now).total_seconds() / 60
+
+            if 0 < time_until_open <= REGISTRATION_UPCOMING_WINDOW:
+                opening_soon.append(comp)
+                logger.info(
+                    f"Registration for {comp['name']} opens in {int(time_until_open)} minutes"
+                )
+
+        except (ValueError, KeyError) as e:
+            logger.warning(f"Error parsing registration_open for {comp_id}: {e}")
+            continue
+
+    return opening_soon
+
+
+def detect_registration_just_opened(
+    competitions: List[Dict[str, Any]], tracking: Dict[str, Dict[str, bool]]
+) -> List[Dict[str, Any]]:
+    """Detect competitions whose registration just opened (within the last hour).
+
+    Args:
+        competitions: List of competition dictionaries
+        tracking: Registration tracking data
+
+    Returns:
+        List of competitions with registration just opened that haven't been notified
+    """
+    now = datetime.datetime.now(datetime.timezone.utc)
+    just_opened = []
+
+    for comp in competitions:
+        comp_id = comp["id"]
+
+        # Skip if already notified about registration being open
+        if tracking.get(comp_id, {}).get("notified_open", False):
+            continue
+
+        # Skip if competition has already started
+        start_date = datetime.datetime.strptime(comp["start_date"], "%Y-%m-%d").date()
+        if start_date <= datetime.datetime.now().date():
+            continue
+
+        # Check if registration_open exists
+        if not comp.get("registration_open"):
+            continue
+
+        try:
+            reg_open = datetime.datetime.strptime(
+                comp["registration_open"], "%Y-%m-%dT%H:%M:%S.%fZ"
+            ).replace(tzinfo=datetime.timezone.utc)
+
+            # Check if registration opened within the last hour
+            time_since_open = (now - reg_open).total_seconds() / 60
+
+            # If registration opened between 0 and 60 minutes ago
+            if 0 <= time_since_open <= 60:
+                just_opened.append(comp)
+                logger.info(
+                    f"Registration for {comp['name']} opened {int(time_since_open)} minutes ago"
+                )
+
+        except (ValueError, KeyError) as e:
+            logger.warning(f"Error parsing registration_open for {comp_id}: {e}")
+            continue
+
+    return just_opened
 
 
 def get_competition_status(comp: Dict[str, Any]) -> str:
@@ -516,16 +710,189 @@ def send_telegram_notification(
     return True
 
 
+def send_registration_upcoming_notification(competition: Dict[str, Any]) -> bool:
+    """Send notification that registration is opening soon for a single competition.
+
+    Args:
+        competition: Competition dictionary
+
+    Returns:
+        True if notification was sent successfully, False otherwise
+    """
+    comp_info = format_competition_info(competition)
+
+    # Calculate time until registration opens
+    now = datetime.datetime.now(datetime.timezone.utc)
+    reg_open = datetime.datetime.strptime(
+        competition["registration_open"], "%Y-%m-%dT%H:%M:%S.%fZ"
+    ).replace(tzinfo=datetime.timezone.utc)
+    minutes_until = int((reg_open - now).total_seconds() / 60)
+
+    # Discord notification
+    discord_success = False
+    if DISCORD_WEBHOOK_URL:
+        embed = {
+            "title": f"⏰ ¡El registro abre pronto!",
+            "description": (
+                f"🏆 **{comp_info['name']}**\n\n"
+                f"🌎 **Ciudad:** {comp_info['city']}\n"
+                f"{comp_info['date_text']}\n"
+                f"⏰ **El registro abre en ~{minutes_until} minutos**\n"
+                f"{comp_info['limit_info']}"
+                f"🎯 **Eventos:** {comp_info['events_text']}"
+            ),
+            "url": f"{comp_info['url']}/register",
+            "color": 0xFFAA00,  # Orange
+            "footer": {"text": f"WCA Competition ID: {comp_info['id']}"},
+        }
+
+        data = {"content": "@everyone", "embeds": [embed]}
+
+        try:
+            response = requests.post(
+                DISCORD_WEBHOOK_URL, json=data, timeout=REQUEST_TIMEOUT
+            )
+            response.raise_for_status()
+            logger.info(
+                f"Discord notification sent: registration opening soon for {competition['name']}"
+            )
+            discord_success = True
+        except requests.exceptions.RequestException as e:
+            logger.error(f"Error sending Discord notification: {e}")
+
+    # Telegram notification
+    telegram_success = False
+    if TELEGRAM_BOT_TOKEN and TELEGRAM_CHANNEL_ID:
+        msg = (
+            f"⏰ *¡El registro abre pronto!*\n\n"
+            f"🏆 *{comp_info['name']}*\n"
+            f"🌍 Ciudad: {comp_info['city']}\n"
+            f"{comp_info['date_text_plain']}\n"
+            f"⏰ *El registro abre en ~{minutes_until} minutos*\n"
+            f"{comp_info['limit_info_plain']}"
+            f"🎯 Eventos: {comp_info['events_text']}\n"
+            f"🔗 [Más información]({comp_info['url']})"
+        )
+
+        payload = {
+            "chat_id": TELEGRAM_CHANNEL_ID,
+            "text": msg,
+            "parse_mode": "Markdown",
+            "disable_web_page_preview": False,
+        }
+
+        try:
+            response = requests.post(
+                f"https://api.telegram.org/bot{TELEGRAM_BOT_TOKEN}/sendMessage",
+                json=payload,
+                timeout=REQUEST_TIMEOUT,
+            )
+            response.raise_for_status()
+            logger.info(
+                f"Telegram notification sent: registration opening soon for {competition['name']}"
+            )
+            telegram_success = True
+        except requests.exceptions.RequestException as e:
+            logger.error(f"Error sending Telegram notification: {e}")
+
+    return discord_success or telegram_success
+
+
+def send_registration_open_notification(competition: Dict[str, Any]) -> bool:
+    """Send notification that registration just opened for a single competition.
+
+    Args:
+        competition: Competition dictionary
+
+    Returns:
+        True if notification was sent successfully, False otherwise
+    """
+    comp_info = format_competition_info(competition)
+
+    # Discord notification
+    discord_success = False
+    if DISCORD_WEBHOOK_URL:
+        embed = {
+            "title": f"🔔 ¡REGISTRO ABIERTO!",
+            "description": (
+                f"🏆 **{comp_info['name']}**\n\n"
+                f"🌎 **Ciudad:** {comp_info['city']}\n"
+                f"{comp_info['date_text']}\n"
+                f"✅ **¡El registro está abierto AHORA!**\n"
+                f"{comp_info['limit_info']}"
+                f"🎯 **Eventos:** {comp_info['events_text']}"
+            ),
+            "url": f"{comp_info['url']}/register",
+            "color": 0x00FF00,  # Green
+            "footer": {"text": f"WCA Competition ID: {comp_info['id']}"},
+        }
+
+        data = {"content": "@everyone", "embeds": [embed]}
+
+        try:
+            response = requests.post(
+                DISCORD_WEBHOOK_URL, json=data, timeout=REQUEST_TIMEOUT
+            )
+            response.raise_for_status()
+            logger.info(
+                f"Discord notification sent: registration open for {competition['name']}"
+            )
+            discord_success = True
+        except requests.exceptions.RequestException as e:
+            logger.error(f"Error sending Discord notification: {e}")
+
+    # Telegram notification
+    telegram_success = False
+    if TELEGRAM_BOT_TOKEN and TELEGRAM_CHANNEL_ID:
+        msg = (
+            f"🔔 *¡REGISTRO ABIERTO!*\n\n"
+            f"🏆 *{comp_info['name']}*\n"
+            f"🌍 Ciudad: {comp_info['city']}\n"
+            f"{comp_info['date_text_plain']}\n"
+            f"✅ *¡El registro está abierto AHORA!*\n"
+            f"{comp_info['limit_info_plain']}"
+            f"🎯 Eventos: {comp_info['events_text']}\n"
+            f"🔗 [Registrarse aquí]({comp_info['url']})"
+        )
+
+        payload = {
+            "chat_id": TELEGRAM_CHANNEL_ID,
+            "text": msg,
+            "parse_mode": "Markdown",
+            "disable_web_page_preview": False,
+        }
+
+        try:
+            response = requests.post(
+                f"https://api.telegram.org/bot{TELEGRAM_BOT_TOKEN}/sendMessage",
+                json=payload,
+                timeout=REQUEST_TIMEOUT,
+            )
+            response.raise_for_status()
+            logger.info(
+                f"Telegram notification sent: registration open for {competition['name']}"
+            )
+            telegram_success = True
+        except requests.exceptions.RequestException as e:
+            logger.error(f"Error sending Telegram notification: {e}")
+
+    return discord_success or telegram_success
+
+
 def main() -> None:
     """Main function to run the WCA competition tracker."""
     logger.info("Starting WCA competition tracking")
 
-    # Ensure data file exists
+    # Ensure data files exist
     initialize_data_file()
+    initialize_registration_tracking_file()
 
-    # Clean out competitions that have already ended - always do this
+    # Clean out old data
     removed_count = clean_old_competitions()
     logger.info(f"Removed {removed_count} old competitions from storage")
+
+    removed_tracking = clean_old_registration_tracking()
+    logger.info(f"Removed {removed_tracking} old tracking entries")
 
     logger.info(f"Fetching competitions from WCA API for country: {DEFAULT_COUNTRY}")
     current_comps = get_competitions()
@@ -554,6 +921,42 @@ def main() -> None:
         save_competitions(current_comps)
     else:
         logger.info("No new competitions detected")
+
+    # Check for registration notifications
+    logger.info("Checking for registration opening notifications")
+    tracking = load_registration_tracking()
+
+    # Detect competitions with registration opening soon
+    upcoming_reg = detect_registration_opening_soon(current_comps, tracking)
+    if upcoming_reg:
+        logger.info(
+            f"Found {len(upcoming_reg)} competitions with registration opening soon"
+        )
+        for comp in upcoming_reg:
+            if send_registration_upcoming_notification(comp):
+                # Mark as notified
+                if comp["id"] not in tracking:
+                    tracking[comp["id"]] = {"notified_upcoming": False, "notified_open": False}
+                tracking[comp["id"]]["notified_upcoming"] = True
+                save_registration_tracking(tracking)
+    else:
+        logger.info("No competitions with registration opening soon")
+
+    # Detect competitions with registration just opened
+    just_opened_reg = detect_registration_just_opened(current_comps, tracking)
+    if just_opened_reg:
+        logger.info(
+            f"Found {len(just_opened_reg)} competitions with registration just opened"
+        )
+        for comp in just_opened_reg:
+            if send_registration_open_notification(comp):
+                # Mark as notified
+                if comp["id"] not in tracking:
+                    tracking[comp["id"]] = {"notified_upcoming": False, "notified_open": False}
+                tracking[comp["id"]]["notified_open"] = True
+                save_registration_tracking(tracking)
+    else:
+        logger.info("No competitions with registration just opened")
 
     logger.info("WCA competition tracking completed")
 
