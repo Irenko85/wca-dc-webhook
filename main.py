@@ -6,6 +6,7 @@ import logging
 from typing import List, Dict, Set, Optional, Any, Union
 from pathlib import Path
 from dotenv import load_dotenv
+from bs4 import BeautifulSoup
 
 # Set up logging
 logging.basicConfig(
@@ -37,9 +38,11 @@ TELEGRAM_CHANNEL_ID = check_env_var("TELEGRAM_CHANNEL_ID")
 # Constants
 PREV_COMPS_FILE = Path("prev_comps.json")
 REGISTRATION_TRACKING_FILE = Path("registration_tracking.json")
+SPOTS_TRACKING_FILE = Path("spots_tracking.json")
 DEFAULT_COUNTRY = "CL"  # Chile as default country
 REQUEST_TIMEOUT = 10  # seconds
 REGISTRATION_UPCOMING_WINDOW = 60  # minutes before registration opens to send "upcoming" notification
+SPOTS_WARNING_THRESHOLD = 0.80  # Notify when 80% of spots are taken
 
 # Dictionary for competition event categories
 EVENTS = {
@@ -373,6 +376,277 @@ def detect_registration_just_opened(
             continue
 
     return just_opened
+
+
+def scrape_registered_competitors(comp_url: str) -> Optional[int]:
+    """Scrape the number of registered competitors from competition page.
+
+    Args:
+        comp_url: Base URL of the competition (e.g., https://www.worldcubeassociation.org/competitions/CompID)
+
+    Returns:
+        Number of registered competitors, or None if scraping failed
+    """
+    try:
+        response = requests.get(comp_url, timeout=REQUEST_TIMEOUT)
+        response.raise_for_status()
+
+        soup = BeautifulSoup(response.text, 'html.parser')
+
+        # Look for tfoot element (contains total competitors count)
+        tfoot = soup.find('tfoot')
+        if tfoot:
+            # Get first td element
+            td = tfoot.find('td')
+            if td:
+                text = td.get_text(strip=True)
+                # Extract first number from text (works for any language)
+                import re
+                match = re.search(r'(\d+)', text)
+                if match:
+                    count = int(match.group(1))
+                    logger.info(f"Scraped competitor count: {count}")
+                    return count
+
+        logger.warning(f"Could not find competitor count in {comp_url}")
+        return None
+
+    except Exception as e:
+        logger.error(f"Error scraping competitor count from {comp_url}: {e}")
+        return None
+
+
+def initialize_spots_tracking_file() -> None:
+    """Ensure spots_tracking.json exists with valid JSON content."""
+    try:
+        if not SPOTS_TRACKING_FILE.exists():
+            logger.info(f"Creating empty {SPOTS_TRACKING_FILE}")
+            SPOTS_TRACKING_FILE.write_text("{}")
+        else:
+            # Validate JSON
+            with open(SPOTS_TRACKING_FILE, "r") as file:
+                json.load(file)
+    except json.JSONDecodeError:
+        logger.error(
+            f"Invalid JSON in {SPOTS_TRACKING_FILE}. Creating new empty file."
+        )
+        SPOTS_TRACKING_FILE.write_text("{}")
+    except Exception as e:
+        logger.error(f"Error initializing spots tracking file: {e}")
+
+
+def load_spots_tracking() -> Dict[str, Dict[str, Any]]:
+    """Load spots tracking data.
+
+    Returns:
+        Dictionary mapping comp_id to tracking data:
+        {
+            "CompID123": {
+                "notified": True,
+                "last_count": 108,
+                "limit": 120
+            }
+        }
+    """
+    try:
+        with open(SPOTS_TRACKING_FILE, "r") as file:
+            return json.load(file)
+    except (json.JSONDecodeError, FileNotFoundError) as e:
+        logger.error(f"Error reading {SPOTS_TRACKING_FILE}: {e}")
+        initialize_spots_tracking_file()
+        return {}
+
+
+def save_spots_tracking(tracking_data: Dict[str, Dict[str, Any]]) -> None:
+    """Save spots tracking data."""
+    try:
+        with open(SPOTS_TRACKING_FILE, "w") as file:
+            json.dump(tracking_data, file, indent=4)
+        logger.info(f"Updated {SPOTS_TRACKING_FILE}")
+    except Exception as e:
+        logger.error(f"Error saving spots tracking: {e}")
+
+
+def clean_old_spots_tracking() -> int:
+    """Remove tracking entries for competitions that have already started.
+
+    Returns:
+        Number of entries removed
+    """
+    today = datetime.datetime.now().date()
+    tracking = load_spots_tracking()
+    comps = load_previous_competitions()
+
+    # Create a set of IDs for competitions that haven't started yet
+    future_comp_ids = {
+        comp["id"]
+        for comp in comps
+        if datetime.datetime.strptime(comp["start_date"], "%Y-%m-%d").date() > today
+    }
+
+    # Filter tracking to only include future competitions
+    new_tracking = {
+        comp_id: data
+        for comp_id, data in tracking.items()
+        if comp_id in future_comp_ids
+    }
+
+    removed_count = len(tracking) - len(new_tracking)
+
+    if removed_count > 0:
+        save_spots_tracking(new_tracking)
+        logger.info(
+            f"Removed {removed_count} old entries from spots tracking"
+        )
+
+    return removed_count
+
+
+def detect_limited_spots(
+    competitions: List[Dict[str, Any]], tracking: Dict[str, Dict[str, Any]]
+) -> List[Dict[str, Any]]:
+    """Detect competitions with limited spots that are almost full.
+
+    Args:
+        competitions: List of competition dictionaries
+        tracking: Spots tracking data
+
+    Returns:
+        List of competitions with spots almost full that haven't been notified
+    """
+    almost_full = []
+
+    for comp in competitions:
+        comp_id = comp["id"]
+
+        # Skip if already notified
+        if tracking.get(comp_id, {}).get("notified", False):
+            continue
+
+        # Skip if competition has already started
+        start_date = datetime.datetime.strptime(comp["start_date"], "%Y-%m-%d").date()
+        if start_date <= datetime.datetime.now().date():
+            continue
+
+        # Skip if no competitor limit
+        competitor_limit = comp.get("competitor_limit")
+        if not competitor_limit:
+            continue
+
+        # Scrape current number of registered competitors
+        comp_url = comp["url"]
+        current_count = scrape_registered_competitors(comp_url)
+
+        if current_count is None:
+            continue
+
+        # Calculate percentage filled
+        percentage_filled = current_count / competitor_limit
+
+        # Update tracking with current count
+        if comp_id not in tracking:
+            tracking[comp_id] = {}
+        tracking[comp_id]["last_count"] = current_count
+        tracking[comp_id]["limit"] = competitor_limit
+
+        # Check if spots are almost full (>= threshold)
+        if percentage_filled >= SPOTS_WARNING_THRESHOLD:
+            almost_full.append({
+                **comp,
+                "current_count": current_count,
+                "percentage_filled": percentage_filled
+            })
+            logger.info(
+                f"Limited spots alert: {comp['name']} has {current_count}/{competitor_limit} spots filled "
+                f"({percentage_filled*100:.1f}%)"
+            )
+
+    return almost_full
+
+
+def send_limited_spots_notification(competition: Dict[str, Any]) -> bool:
+    """Send notification that a competition is almost full.
+
+    Args:
+        competition: Competition dictionary with current_count and percentage_filled
+
+    Returns:
+        True if notification was sent successfully, False otherwise
+    """
+    comp_info = format_competition_info(competition)
+    current_count = competition["current_count"]
+    limit = competition["competitor_limit"]
+    percentage = competition["percentage_filled"] * 100
+    spots_left = limit - current_count
+
+    # Discord notification
+    discord_success = False
+    if DISCORD_WEBHOOK_URL:
+        embed = {
+            "title": f"⚠️ ¡CUPOS LIMITADOS!",
+            "description": (
+                f"🏆 **{comp_info['name']}**\n\n"
+                f"🌎 **Ciudad:** {comp_info['city']}\n"
+                f"{comp_info['date_text']}\n"
+                f"⚠️ **¡Quedan solo {spots_left} cupos disponibles!**\n"
+                f"📊 **Inscritos:** {current_count}/{limit} ({percentage:.1f}%)\n"
+                f"🎯 **Eventos:** {comp_info['events_text']}"
+            ),
+            "url": f"{comp_info['url']}/register",
+            "color": 0xFF0000,  # Red
+            "footer": {"text": f"WCA Competition ID: {comp_info['id']}"},
+        }
+
+        data = {"content": "@everyone", "embeds": [embed]}
+
+        try:
+            response = requests.post(
+                DISCORD_WEBHOOK_URL, json=data, timeout=REQUEST_TIMEOUT
+            )
+            response.raise_for_status()
+            logger.info(
+                f"Discord notification sent: limited spots for {competition['name']}"
+            )
+            discord_success = True
+        except requests.exceptions.RequestException as e:
+            logger.error(f"Error sending Discord notification: {e}")
+
+    # Telegram notification
+    telegram_success = False
+    if TELEGRAM_BOT_TOKEN and TELEGRAM_CHANNEL_ID:
+        msg = (
+            f"⚠️ *¡CUPOS LIMITADOS!*\n\n"
+            f"🏆 *{comp_info['name']}*\n"
+            f"🌍 Ciudad: {comp_info['city']}\n"
+            f"{comp_info['date_text_plain']}\n"
+            f"⚠️ *¡Quedan solo {spots_left} cupos disponibles!*\n"
+            f"📊 Inscritos: {current_count}/{limit} ({percentage:.1f}%)\n"
+            f"🎯 Eventos: {comp_info['events_text']}\n"
+            f"🔗 [Registrarse aquí]({comp_info['url']}/register)"
+        )
+
+        payload = {
+            "chat_id": TELEGRAM_CHANNEL_ID,
+            "text": msg,
+            "parse_mode": "Markdown",
+            "disable_web_page_preview": False,
+        }
+
+        try:
+            response = requests.post(
+                f"https://api.telegram.org/bot{TELEGRAM_BOT_TOKEN}/sendMessage",
+                json=payload,
+                timeout=REQUEST_TIMEOUT,
+            )
+            response.raise_for_status()
+            logger.info(
+                f"Telegram notification sent: limited spots for {competition['name']}"
+            )
+            telegram_success = True
+        except requests.exceptions.RequestException as e:
+            logger.error(f"Error sending Telegram notification: {e}")
+
+    return discord_success or telegram_success
 
 
 def get_competition_status(comp: Dict[str, Any]) -> str:
@@ -886,6 +1160,7 @@ def main() -> None:
     # Ensure data files exist
     initialize_data_file()
     initialize_registration_tracking_file()
+    initialize_spots_tracking_file()
 
     # Clean out old data
     removed_count = clean_old_competitions()
@@ -893,6 +1168,9 @@ def main() -> None:
 
     removed_tracking = clean_old_registration_tracking()
     logger.info(f"Removed {removed_tracking} old tracking entries")
+
+    removed_spots = clean_old_spots_tracking()
+    logger.info(f"Removed {removed_spots} old spots tracking entries")
 
     logger.info(f"Fetching competitions from WCA API for country: {DEFAULT_COUNTRY}")
     current_comps = get_competitions()
@@ -957,6 +1235,29 @@ def main() -> None:
                 save_registration_tracking(tracking)
     else:
         logger.info("No competitions with registration just opened")
+
+    # Check for limited spots notifications
+    logger.info("Checking for limited spots notifications")
+    spots_tracking = load_spots_tracking()
+
+    # Detect competitions with limited spots
+    limited_spots = detect_limited_spots(current_comps, spots_tracking)
+    if limited_spots:
+        logger.info(
+            f"Found {len(limited_spots)} competitions with limited spots"
+        )
+        for comp in limited_spots:
+            if send_limited_spots_notification(comp):
+                # Mark as notified
+                if comp["id"] not in spots_tracking:
+                    spots_tracking[comp["id"]] = {}
+                spots_tracking[comp["id"]]["notified"] = True
+                save_spots_tracking(spots_tracking)
+    else:
+        logger.info("No competitions with limited spots")
+
+    # Save spots tracking even if no notifications sent (to update last_count)
+    save_spots_tracking(spots_tracking)
 
     logger.info("WCA competition tracking completed")
 
