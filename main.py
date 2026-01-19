@@ -379,40 +379,37 @@ def detect_registration_just_opened(
 
 
 def scrape_registered_competitors(comp_url: str) -> Optional[int]:
-    """Scrape the number of registered competitors from competition page.
+    """Get the number of registered competitors from competition WCIF API.
 
     Args:
         comp_url: Base URL of the competition (e.g., https://www.worldcubeassociation.org/competitions/CompID)
 
     Returns:
-        Number of registered competitors, or None if scraping failed
+        Number of accepted competitors, or None if API call failed
     """
     try:
-        response = requests.get(comp_url, timeout=REQUEST_TIMEOUT)
+        # Extract competition ID from URL
+        comp_id = comp_url.rstrip('/').split('/')[-1]
+
+        # Use WCIF public API endpoint
+        wcif_url = f"https://www.worldcubeassociation.org/api/v0/competitions/{comp_id}/wcif/public"
+        response = requests.get(wcif_url, timeout=REQUEST_TIMEOUT)
         response.raise_for_status()
 
-        soup = BeautifulSoup(response.text, 'html.parser')
+        data = response.json()
+        persons = data.get('persons', [])
 
-        # Look for tfoot element (contains total competitors count)
-        tfoot = soup.find('tfoot')
-        if tfoot:
-            # Get first td element
-            td = tfoot.find('td')
-            if td:
-                text = td.get_text(strip=True)
-                # Extract first number from text (works for any language)
-                import re
-                match = re.search(r'(\d+)', text)
-                if match:
-                    count = int(match.group(1))
-                    logger.info(f"Scraped competitor count: {count}")
-                    return count
+        # Count only accepted competitors (not pending/waiting list, not staff without registration)
+        accepted_count = len([
+            p for p in persons
+            if p.get('registration') and p['registration'].get('status') == 'accepted'
+        ])
 
-        logger.warning(f"Could not find competitor count in {comp_url}")
-        return None
+        logger.info(f"Found {accepted_count} accepted competitors for {comp_id}")
+        return accepted_count
 
     except Exception as e:
-        logger.error(f"Error scraping competitor count from {comp_url}: {e}")
+        logger.error(f"Error getting competitor count from WCIF API for {comp_url}: {e}")
         return None
 
 
