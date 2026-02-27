@@ -33,7 +33,7 @@
             "pyram",
             "sq1"
         ],
-        "time_until_registration": "2 days",
+        "time_until_registration": "12 days",
         "date_range": "May 2 - 3, 2026",
         "delegates": [
             {
@@ -43,7 +43,7 @@
                 "gender": "m",
                 "country_iso2": "CL",
                 "created_at": "2017-12-14T04:36:31.000Z",
-                "updated_at": "2026-02-11T17:45:01.000Z",
+                "updated_at": "2026-02-17T01:20:41.000Z",
                 "url": "https://www.worldcubeassociation.org/persons/2019LUCE01",
                 "country": {
                     "id": "Chile",
@@ -77,7 +77,7 @@
                 "gender": "m",
                 "country_iso2": "CL",
                 "created_at": "2018-08-10T02:44:15.000Z",
-                "updated_at": "2026-02-12T20:23:42.000Z",
+                "updated_at": "2026-02-26T08:15:35.000Z",
                 "url": "https://www.worldcubeassociation.org/persons/2017PERE38",
                 "country": {
                     "id": "Chile",
@@ -110,7 +110,7 @@
                 "gender": "m",
                 "country_iso2": "CL",
                 "created_at": "2017-12-14T04:36:31.000Z",
-                "updated_at": "2026-02-11T17:45:01.000Z",
+                "updated_at": "2026-02-17T01:20:41.000Z",
                 "url": "https://www.worldcubeassociation.org/persons/2019LUCE01",
                 "country": {
                     "id": "Chile",
@@ -144,7 +144,7 @@
                 "gender": "m",
                 "country_iso2": "CL",
                 "created_at": "2018-08-10T02:44:15.000Z",
-                "updated_at": "2026-02-12T20:23:42.000Z",
+                "updated_at": "2026-02-26T08:15:35.000Z",
                 "url": "https://www.worldcubeassociation.org/persons/2017PERE38",
                 "country": {
                     "id": "Chile",
@@ -164,6 +164,107 @@
                     "thumbnail_crop_h": 690,
                     "url": "https://avatars.worldcubeassociation.org/l7e5bu6eckivxdln8mwnk0uwsu3i",
                     "thumb_url": "https://avatars.worldcubeassociation.org/cnsrav4oak5nce682reac0epq5bl",
+                    "is_default": false,
+                    "can_edit_thumbnail": true
+                }
+            }
+        ],
+        "class": "competition"
+    },
+    {
+        "id": "AltosPlaceres2026",
+        "name": "Altos Placeres 2026",
+        "start_date": "2026-03-28",
+        "end_date": "2026-03-28",
+        "registration_open": "2026-03-03T02:59:00.000Z",
+        "registration_close": "2026-03-24T02:59:00.000Z",
+        "announced_at": "2026-02-27T07:45:51.000Z",
+        "cancelled_at": null,
+        "results_posted_at": null,
+        "competitor_limit": 35,
+        "venue": "Salon de eventos del edificio",
+        "url": "https://www.worldcubeassociation.org/competitions/AltosPlaceres2026",
+        "website": "https://www.worldcubeassociation.org/competitions/AltosPlaceres2026",
+        "short_name": "Altos Placeres 2026",
+        "short_display_name": "Altos Placeres 2026",
+        "city": "Valparaiso",
+        "venue_address": "Intersecci\u00f3n R\u00edo Choapa con Hamburgo, Cerro Los Placeres, Valparaiso.",
+        "venue_details": "Salon de eventos del edificio. La direccion exacta se enviara por correo a los registros aprobados.",
+        "latitude_degrees": -33.046126,
+        "longitude_degrees": -71.577558,
+        "country_iso2": "CL",
+        "event_ids": [
+            "333",
+            "444",
+            "555",
+            "minx"
+        ],
+        "time_until_registration": "4 days",
+        "date_range": "Mar 28, 2026",
+        "delegates": [
+            {
+                "id": 273,
+                "wca_id": "2009GARC02",
+                "name": "Felipe Andres Rojas Garces",
+                "gender": "m",
+                "country_iso2": "CL",
+                "created_at": "2015-06-02T01:35:25.000Z",
+                "updated_at": "2026-02-27T06:20:36.000Z",
+                "url": "https://www.worldcubeassociation.org/persons/2009GARC02",
+                "country": {
+                    "id": "Chile",
+                    "name": "Chile",
+                    "continent_id": "_South America",
+                    "iso2": "CL"
+                },
+                "location": "Chile (Santiago)",
+                "region_id": 51,
+                "delegate_status": "delegate",
+                "email": "fgarces@worldcubeassociation.org",
+                "class": "user",
+                "teams": [],
+                "avatar": {
+                    "id": 119,
+                    "status": "approved",
+                    "thumbnail_crop_x": 162,
+                    "thumbnail_crop_y": 198,
+                    "thumbnail_crop_w": 542,
+                    "thumbnail_crop_h": 542,
+                    "url": "https://avatars.worldcubeassociation.org/uploads/user/avatar/2009GARC02/1448552195.jpg",
+                    "thumb_url": "https://avatars.worldcubeassociation.org/uploads/user/avatar/2009GARC02/1448552195_thumb.jpg",
+                    "is_default": false,
+                    "can_edit_thumbnail": false
+                }
+            }
+        ],
+        "organizers": [
+            {
+                "id": 39849,
+                "wca_id": "2017WACH01",
+                "name": "Atal\u00eda Wachtendorff",
+                "gender": "f",
+                "country_iso2": "CL",
+                "created_at": "2017-01-04T16:35:46.000Z",
+                "updated_at": "2026-02-27T05:37:36.000Z",
+                "url": "https://www.worldcubeassociation.org/persons/2017WACH01",
+                "country": {
+                    "id": "Chile",
+                    "name": "Chile",
+                    "continent_id": "_South America",
+                    "iso2": "CL"
+                },
+                "delegate_status": null,
+                "class": "user",
+                "teams": [],
+                "avatar": {
+                    "id": 87659,
+                    "status": "approved",
+                    "thumbnail_crop_x": 0,
+                    "thumbnail_crop_y": 0,
+                    "thumbnail_crop_w": 1080,
+                    "thumbnail_crop_h": 1080,
+                    "url": "https://avatars.worldcubeassociation.org/6i0vweuhig4mjcj76jf7keuccnvb",
+                    "thumb_url": "https://avatars.worldcubeassociation.org/mjodl29m8uq13b2549avp9eecor1",
                     "is_default": false,
                     "can_edit_thumbnail": true
                 }
@@ -201,7 +302,7 @@
             "666",
             "777"
         ],
-        "time_until_registration": "4 days",
+        "time_until_registration": "10 days",
         "date_range": "Mar 14, 2026",
         "delegates": [
             {
@@ -211,7 +312,7 @@
                 "gender": "m",
                 "country_iso2": "CL",
                 "created_at": "2015-06-02T01:35:25.000Z",
-                "updated_at": "2026-02-11T21:44:26.000Z",
+                "updated_at": "2026-02-27T06:20:36.000Z",
                 "url": "https://www.worldcubeassociation.org/persons/2009GARC02",
                 "country": {
                     "id": "Chile",
@@ -245,7 +346,7 @@
                 "gender": "m",
                 "country_iso2": "CL",
                 "created_at": "2018-08-10T02:44:15.000Z",
-                "updated_at": "2026-02-12T20:23:42.000Z",
+                "updated_at": "2026-02-26T08:15:35.000Z",
                 "url": "https://www.worldcubeassociation.org/persons/2017PERE38",
                 "country": {
                     "id": "Chile",
@@ -276,7 +377,7 @@
                 "gender": "m",
                 "country_iso2": "CL",
                 "created_at": "2022-06-05T14:25:00.000Z",
-                "updated_at": "2026-02-12T16:43:48.000Z",
+                "updated_at": "2026-02-24T22:51:21.000Z",
                 "url": "https://www.worldcubeassociation.org/persons/2022FLOR05",
                 "country": {
                     "id": "Chile",
@@ -309,7 +410,7 @@
                 "gender": "m",
                 "country_iso2": "CL",
                 "created_at": "2023-10-21T03:51:20.000Z",
-                "updated_at": "2026-02-12T20:21:50.000Z",
+                "updated_at": "2026-02-27T00:51:33.000Z",
                 "url": "https://www.worldcubeassociation.org/persons/2023MORA74",
                 "country": {
                     "id": "Chile",
@@ -340,7 +441,7 @@
                 "gender": "o",
                 "country_iso2": "CL",
                 "created_at": "2025-12-24T21:35:55.000Z",
-                "updated_at": "2026-02-11T04:54:57.000Z",
+                "updated_at": "2026-02-27T03:39:04.000Z",
                 "url": "",
                 "country": {
                     "id": "Chile",
@@ -358,8 +459,8 @@
                     "thumbnail_crop_y": 0,
                     "thumbnail_crop_w": 100,
                     "thumbnail_crop_h": 100,
-                    "url": "https://assets.worldcubeassociation.org/assets/af5a0fb/assets/missing_avatar_thumb-d77f478a307a91a9d4a083ad197012a391d5410f6dd26cb0b0e3118a5de71438.png",
-                    "thumb_url": "https://assets.worldcubeassociation.org/assets/af5a0fb/assets/missing_avatar_thumb-d77f478a307a91a9d4a083ad197012a391d5410f6dd26cb0b0e3118a5de71438.png",
+                    "url": "https://assets.worldcubeassociation.org/assets/64615a0/assets/missing_avatar_thumb-d77f478a307a91a9d4a083ad197012a391d5410f6dd26cb0b0e3118a5de71438.png",
+                    "thumb_url": "https://assets.worldcubeassociation.org/assets/64615a0/assets/missing_avatar_thumb-d77f478a307a91a9d4a083ad197012a391d5410f6dd26cb0b0e3118a5de71438.png",
                     "is_default": true,
                     "can_edit_thumbnail": false
                 }
