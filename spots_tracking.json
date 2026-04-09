@@ -4,7 +4,11 @@
         "limit": 50
     },
     "MaculOtono2026": {
-        "last_count": 29,
+        "last_count": 30,
         "limit": 70
+    },
+    "PUCValCubo2026": {
+        "last_count": 0,
+        "limit": 60
     }
 }
