@@ -10,5 +10,9 @@
     "PUCValCubo2026": {
         "last_count": 0,
         "limit": 60
+    },
+    "WarmupLasCondes2026": {
+        "last_count": 0,
+        "limit": 45
     }
 }
