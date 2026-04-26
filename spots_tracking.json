@@ -1,7 +1,8 @@
 {
     "CubiKonce2026": {
-        "last_count": 39,
-        "limit": 50
+        "last_count": 40,
+        "limit": 50,
+        "notified": true
     },
     "PUCValCubo2026": {
         "last_count": 8,
