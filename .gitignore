@@ -3,3 +3,9 @@
 __pycache__/
 *.pyc
 *.pyo
+
+# Entorno local
+.env
+
+# Base de datos local (persiste en el servidor)
+data/

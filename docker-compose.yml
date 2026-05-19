@@ -1,0 +1,14 @@
+services:
+  wca-tracker:
+    build: .
+    container_name: wca-tracker
+    restart: unless-stopped
+    user: "1000:1000"
+    env_file: .env
+    volumes:
+      - ./data:/app/data
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
