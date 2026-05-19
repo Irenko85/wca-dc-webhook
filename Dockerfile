@@ -2,7 +2,7 @@ FROM python:3.12-slim
 
 # Instalar supercronic
 ARG SUPERCRONIC_VERSION=0.2.33
-ARG SUPERCRONIC_SHA1SUM=3eb8e8a33f225a0ac5e685adabcb1db1e5b03e53
+ARG SUPERCRONIC_SHA1SUM=71b0d58cc53f6bd72cf2f293e09e294b79c666d8
 RUN apt-get update && apt-get install -y --no-install-recommends curl ca-certificates && \
     curl -fsSLO "https://github.com/aptible/supercronic/releases/download/v${SUPERCRONIC_VERSION}/supercronic-linux-amd64" && \
     echo "${SUPERCRONIC_SHA1SUM}  supercronic-linux-amd64" | sha1sum -c - && \
