@@ -39,6 +39,8 @@ TELEGRAM_CHANNEL_ID = check_env_var("TELEGRAM_CHANNEL_ID")
 PREV_COMPS_FILE = Path("prev_comps.json")
 REGISTRATION_TRACKING_FILE = Path("registration_tracking.json")
 SPOTS_TRACKING_FILE = Path("spots_tracking.json")
+import sqlite3
+DB_FILE = os.getenv("DB_PATH", "wca_tracker.sqlite3")
 DEFAULT_COUNTRY = "CL"  # Chile as default country
 REQUEST_TIMEOUT = 10  # seconds
 REGISTRATION_UPCOMING_WINDOW = 60  # minutes before registration opens to send "upcoming" notification
@@ -73,21 +75,35 @@ EMBED_COLORS = {
 }
 
 
-def initialize_data_file() -> None:
-    """Ensure prev_comps.json exists with valid JSON content."""
-    try:
-        if not PREV_COMPS_FILE.exists():
-            logger.info(f"Creating empty {PREV_COMPS_FILE}")
-            PREV_COMPS_FILE.write_text("[]")
-        else:
-            # Validate JSON
-            with open(PREV_COMPS_FILE, "r") as file:
-                json.load(file)
-    except json.JSONDecodeError:
-        logger.error(f"Invalid JSON in {PREV_COMPS_FILE}. Creating new empty file.")
-        PREV_COMPS_FILE.write_text("[]")
-    except Exception as e:
-        logger.error(f"Error initializing data file: {e}")
+def initialize_database() -> None:
+    """Inicializa la base de datos SQLite con las tablas necesarias."""
+    conn = sqlite3.connect(DB_FILE)
+    cursor = conn.cursor()
+    cursor.executescript("""
+        CREATE TABLE IF NOT EXISTS competitions (
+            id TEXT PRIMARY KEY,
+            data TEXT NOT NULL,
+            start_date TEXT NOT NULL,
+            end_date TEXT NOT NULL,
+            created_at TEXT DEFAULT CURRENT_TIMESTAMP,
+            updated_at TEXT DEFAULT CURRENT_TIMESTAMP
+        );
+
+        CREATE TABLE IF NOT EXISTS registration_tracking (
+            comp_id TEXT PRIMARY KEY,
+            notified_upcoming INTEGER NOT NULL DEFAULT 0,
+            notified_open INTEGER NOT NULL DEFAULT 0
+        );
+
+        CREATE TABLE IF NOT EXISTS spots_tracking (
+            comp_id TEXT PRIMARY KEY,
+            notified INTEGER NOT NULL DEFAULT 0,
+            last_count INTEGER,
+            spot_limit INTEGER
+        );
+    """)
+    conn.commit()
+    conn.close()
 
 
 def get_competitions(country: str = DEFAULT_COUNTRY) -> List[Dict[str, Any]]:
@@ -116,65 +132,63 @@ def get_competitions(country: str = DEFAULT_COUNTRY) -> List[Dict[str, Any]]:
 
 
 def load_previous_competitions() -> List[Dict[str, Any]]:
-    """Load previous competitions from prev_comps.json."""
-    try:
-        with open(PREV_COMPS_FILE, "r") as file:
-            return json.load(file)
-    except (json.JSONDecodeError, FileNotFoundError) as e:
-        logger.error(f"Error reading {PREV_COMPS_FILE}: {e}")
-        initialize_data_file()
-        return []
+    """Carga todas las competencias almacenadas desde SQLite."""
+    conn = sqlite3.connect(DB_FILE)
+    cursor = conn.cursor()
+    cursor.execute("SELECT data FROM competitions")
+    rows = cursor.fetchall()
+    conn.close()
+    return [json.loads(row[0]) for row in rows]
 
 
 def clean_old_competitions() -> int:
-    """
-    Remove competitions from prev_comps.json that have already ended.
-
-    Returns:
-        Number of competitions removed
-    """
-    today = datetime.datetime.now().date()
-    comps = load_previous_competitions()
-
-    # Filter competitions with end_date on or after today
-    new_comps = [
-        comp
-        for comp in comps
-        if datetime.datetime.strptime(comp["end_date"], "%Y-%m-%d").date() >= today
-    ]
-
-    removed_count = len(comps) - len(new_comps)
-
+    """Elimina competencias cuya end_date ya pasó."""
+    today = datetime.date.today().isoformat()
+    conn = sqlite3.connect(DB_FILE)
+    cursor = conn.cursor()
+    cursor.execute("DELETE FROM competitions WHERE end_date < ?", (today,))
+    removed_count = cursor.rowcount
+    conn.commit()
+    conn.close()
     if removed_count > 0:
-        with open(PREV_COMPS_FILE, "w") as file:
-            json.dump(new_comps, file, indent=4)
         logger.info(f"Removed {removed_count} completed competitions from storage")
     else:
         logger.info("No completed competitions to remove")
-
     return removed_count
 
 
 def save_competitions(competitions: List[Dict[str, Any]]) -> bool:
-    """Save current competitions to prev_comps.json only if there are changes.
-
-    Returns:
-        True if changes were saved, False otherwise
-    """
-    previous_comps = load_previous_competitions()
-
-    # Compare by IDs instead of full objects
-    prev_ids = {comp["id"] for comp in previous_comps}
+    """Guarda la lista de competencias en SQLite. Retorna True si hubo cambios."""
+    previous = load_previous_competitions()
+    prev_ids = {comp["id"] for comp in previous}
     current_ids = {comp["id"] for comp in competitions}
 
-    if prev_ids != current_ids:
-        with open(PREV_COMPS_FILE, "w") as file:
-            json.dump(competitions, file, indent=4)
-        logger.info(f"Updated {PREV_COMPS_FILE} with {len(competitions)} competitions")
-        return True
-    else:
-        logger.info(f"No changes in competitions, {PREV_COMPS_FILE} remains unchanged")
+    if prev_ids == current_ids:
+        logger.info("No changes in competitions, database remains unchanged")
         return False
+
+    conn = sqlite3.connect(DB_FILE)
+    cursor = conn.cursor()
+    for comp in competitions:
+        cursor.execute("""
+            INSERT INTO competitions (id, data, start_date, end_date, updated_at)
+            VALUES (?, ?, ?, ?, CURRENT_TIMESTAMP)
+            ON CONFLICT(id) DO UPDATE SET
+                data = excluded.data,
+                start_date = excluded.start_date,
+                end_date = excluded.end_date,
+                updated_at = CURRENT_TIMESTAMP
+        """, (comp["id"], json.dumps(comp), comp["start_date"], comp["end_date"]))
+
+    # Eliminar comps que ya no están en la lista actual
+    removed_ids = prev_ids - current_ids
+    for comp_id in removed_ids:
+        cursor.execute("DELETE FROM competitions WHERE id = ?", (comp_id,))
+
+    conn.commit()
+    conn.close()
+    logger.info(f"Updated database with {len(competitions)} competitions")
+    return True
 
 
 def detect_new_competitions(
@@ -186,90 +200,55 @@ def detect_new_competitions(
     return new_comps
 
 
-def initialize_registration_tracking_file() -> None:
-    """Ensure registration_tracking.json exists with valid JSON content."""
-    try:
-        if not REGISTRATION_TRACKING_FILE.exists():
-            logger.info(f"Creating empty {REGISTRATION_TRACKING_FILE}")
-            REGISTRATION_TRACKING_FILE.write_text("{}")
-        else:
-            # Validate JSON
-            with open(REGISTRATION_TRACKING_FILE, "r") as file:
-                json.load(file)
-    except json.JSONDecodeError:
-        logger.error(
-            f"Invalid JSON in {REGISTRATION_TRACKING_FILE}. Creating new empty file."
-        )
-        REGISTRATION_TRACKING_FILE.write_text("{}")
-    except Exception as e:
-        logger.error(f"Error initializing registration tracking file: {e}")
-
-
 def load_registration_tracking() -> Dict[str, Dict[str, bool]]:
-    """Load registration notification tracking data.
-
-    Returns:
-        Dictionary mapping comp_id to tracking data:
-        {
-            "CompID123": {
-                "notified_upcoming": True,
-                "notified_open": False
-            }
-        }
-    """
-    try:
-        with open(REGISTRATION_TRACKING_FILE, "r") as file:
-            return json.load(file)
-    except (json.JSONDecodeError, FileNotFoundError) as e:
-        logger.error(f"Error reading {REGISTRATION_TRACKING_FILE}: {e}")
-        initialize_registration_tracking_file()
-        return {}
+    """Carga el tracking de notificaciones de registro desde SQLite."""
+    conn = sqlite3.connect(DB_FILE)
+    cursor = conn.cursor()
+    cursor.execute("SELECT comp_id, notified_upcoming, notified_open FROM registration_tracking")
+    rows = cursor.fetchall()
+    conn.close()
+    return {
+        row[0]: {"notified_upcoming": bool(row[1]), "notified_open": bool(row[2])}
+        for row in rows
+    }
 
 
 def save_registration_tracking(tracking_data: Dict[str, Dict[str, bool]]) -> None:
-    """Save registration notification tracking data."""
-    try:
-        with open(REGISTRATION_TRACKING_FILE, "w") as file:
-            json.dump(tracking_data, file, indent=4)
-        logger.info(f"Updated {REGISTRATION_TRACKING_FILE}")
-    except Exception as e:
-        logger.error(f"Error saving registration tracking: {e}")
+    """Persiste el tracking de notificaciones de registro en SQLite."""
+    conn = sqlite3.connect(DB_FILE)
+    cursor = conn.cursor()
+    for comp_id, flags in tracking_data.items():
+        cursor.execute("""
+            INSERT INTO registration_tracking (comp_id, notified_upcoming, notified_open)
+            VALUES (?, ?, ?)
+            ON CONFLICT(comp_id) DO UPDATE SET
+                notified_upcoming = excluded.notified_upcoming,
+                notified_open = excluded.notified_open
+        """, (
+            comp_id,
+            int(flags.get("notified_upcoming", False)),
+            int(flags.get("notified_open", False))
+        ))
+    conn.commit()
+    conn.close()
+    logger.info("Updated registration tracking in database")
 
 
 def clean_old_registration_tracking() -> int:
-    """Remove tracking entries for competitions that have already started.
-
-    Returns:
-        Number of entries removed
-    """
-    today = datetime.datetime.now().date()
-    tracking = load_registration_tracking()
-    comps = load_previous_competitions()
-
-    # Create a set of IDs for competitions that haven't started yet
-    future_comp_ids = {
-        comp["id"]
-        for comp in comps
-        if datetime.datetime.strptime(comp["start_date"], "%Y-%m-%d").date() > today
-    }
-
-    # Filter tracking to only include future competitions
-    new_tracking = {
-        comp_id: data
-        for comp_id, data in tracking.items()
-        if comp_id in future_comp_ids
-    }
-
-    removed_count = len(tracking) - len(new_tracking)
-
+    """Elimina tracking de comps que ya no están en la tabla competitions."""
+    conn = sqlite3.connect(DB_FILE)
+    cursor = conn.cursor()
+    cursor.execute("""
+        DELETE FROM registration_tracking
+        WHERE comp_id NOT IN (SELECT id FROM competitions)
+    """)
+    removed_count = cursor.rowcount
+    conn.commit()
+    conn.close()
     if removed_count > 0:
-        save_registration_tracking(new_tracking)
-        logger.info(
-            f"Removed {removed_count} old entries from registration tracking"
-        )
+        logger.info(f"Removed {removed_count} old entries from registration tracking")
     else:
         logger.info("No old registration tracking entries to remove")
-
     return removed_count
 
 
@@ -413,89 +392,61 @@ def scrape_registered_competitors(comp_url: str) -> Optional[int]:
         return None
 
 
-def initialize_spots_tracking_file() -> None:
-    """Ensure spots_tracking.json exists with valid JSON content."""
-    try:
-        if not SPOTS_TRACKING_FILE.exists():
-            logger.info(f"Creating empty {SPOTS_TRACKING_FILE}")
-            SPOTS_TRACKING_FILE.write_text("{}")
-        else:
-            # Validate JSON
-            with open(SPOTS_TRACKING_FILE, "r") as file:
-                json.load(file)
-    except json.JSONDecodeError:
-        logger.error(
-            f"Invalid JSON in {SPOTS_TRACKING_FILE}. Creating new empty file."
-        )
-        SPOTS_TRACKING_FILE.write_text("{}")
-    except Exception as e:
-        logger.error(f"Error initializing spots tracking file: {e}")
-
-
 def load_spots_tracking() -> Dict[str, Dict[str, Any]]:
-    """Load spots tracking data.
-
-    Returns:
-        Dictionary mapping comp_id to tracking data:
-        {
-            "CompID123": {
-                "notified": True,
-                "last_count": 108,
-                "limit": 120
-            }
+    """Carga el tracking de cupos disponibles desde SQLite."""
+    conn = sqlite3.connect(DB_FILE)
+    cursor = conn.cursor()
+    cursor.execute("SELECT comp_id, notified, last_count, spot_limit FROM spots_tracking")
+    rows = cursor.fetchall()
+    conn.close()
+    result = {}
+    for row in rows:
+        result[row[0]] = {
+            "notified": bool(row[1]),
+            "last_count": row[2],
+            "limit": row[3]
         }
-    """
-    try:
-        with open(SPOTS_TRACKING_FILE, "r") as file:
-            return json.load(file)
-    except (json.JSONDecodeError, FileNotFoundError) as e:
-        logger.error(f"Error reading {SPOTS_TRACKING_FILE}: {e}")
-        initialize_spots_tracking_file()
-        return {}
+    return result
 
 
 def save_spots_tracking(tracking_data: Dict[str, Dict[str, Any]]) -> None:
-    """Save spots tracking data."""
-    try:
-        with open(SPOTS_TRACKING_FILE, "w") as file:
-            json.dump(tracking_data, file, indent=4)
-        logger.info(f"Updated {SPOTS_TRACKING_FILE}")
-    except Exception as e:
-        logger.error(f"Error saving spots tracking: {e}")
+    """Persiste el tracking de cupos en SQLite."""
+    conn = sqlite3.connect(DB_FILE)
+    cursor = conn.cursor()
+    for comp_id, data in tracking_data.items():
+        cursor.execute("""
+            INSERT INTO spots_tracking (comp_id, notified, last_count, spot_limit)
+            VALUES (?, ?, ?, ?)
+            ON CONFLICT(comp_id) DO UPDATE SET
+                notified = excluded.notified,
+                last_count = excluded.last_count,
+                spot_limit = excluded.spot_limit
+        """, (
+            comp_id,
+            int(data.get("notified", False)),
+            data.get("last_count"),
+            data.get("limit")
+        ))
+    conn.commit()
+    conn.close()
+    logger.info("Updated spots tracking in database")
 
 
 def clean_old_spots_tracking() -> int:
-    """Remove tracking entries for competitions that have already started.
-
-    Returns:
-        Number of entries removed
-    """
-    today = datetime.datetime.now().date()
-    tracking = load_spots_tracking()
-    comps = load_previous_competitions()
-
-    # Create a set of IDs for competitions that haven't started yet
-    future_comp_ids = {
-        comp["id"]
-        for comp in comps
-        if datetime.datetime.strptime(comp["start_date"], "%Y-%m-%d").date() > today
-    }
-
-    # Filter tracking to only include future competitions
-    new_tracking = {
-        comp_id: data
-        for comp_id, data in tracking.items()
-        if comp_id in future_comp_ids
-    }
-
-    removed_count = len(tracking) - len(new_tracking)
-
+    """Elimina tracking de cupos de comps que ya no están en la tabla competitions."""
+    conn = sqlite3.connect(DB_FILE)
+    cursor = conn.cursor()
+    cursor.execute("""
+        DELETE FROM spots_tracking
+        WHERE comp_id NOT IN (SELECT id FROM competitions)
+    """)
+    removed_count = cursor.rowcount
+    conn.commit()
+    conn.close()
     if removed_count > 0:
-        save_spots_tracking(new_tracking)
-        logger.info(
-            f"Removed {removed_count} old entries from spots tracking"
-        )
-
+        logger.info(f"Removed {removed_count} old entries from spots tracking")
+    else:
+        logger.info("No old spots tracking entries to remove")
     return removed_count
 
 
@@ -1155,9 +1106,7 @@ def main() -> None:
     logger.info("Starting WCA competition tracking")
 
     # Ensure data files exist
-    initialize_data_file()
-    initialize_registration_tracking_file()
-    initialize_spots_tracking_file()
+    initialize_database()
 
     # Clean out old data
     removed_count = clean_old_competitions()
