@@ -3,21 +3,14 @@ import logging
 from typing import Optional
 from dotenv import load_dotenv
 
-# Set up logging
-logging.basicConfig(
-    level=logging.INFO,
-    format="%(asctime)s - %(levelname)s - %(message)s",
-    datefmt="%Y-%m-%d %H:%M:%S",
-)
 logger = logging.getLogger(__name__)
 
 # Load environment variables
 load_dotenv()
 
 
-def check_env_var(var_name: str) -> Optional[str]:
+def _check_env_var(value: Optional[str], var_name: str) -> Optional[str]:
     """Check if an environment variable exists and log a warning if not."""
-    value = os.getenv(var_name)
     if not value:
         logger.warning(
             f"{var_name} not found in environment variables! Was the main.yml updated?"
@@ -25,10 +18,22 @@ def check_env_var(var_name: str) -> Optional[str]:
     return value
 
 
+def bootstrap() -> None:
+    """Initialize logging configuration and validate environment variables."""
+    logging.basicConfig(
+        level=logging.INFO,
+        format="%(asctime)s - %(levelname)s - %(message)s",
+        datefmt="%Y-%m-%d %H:%M:%S",
+    )
+    _check_env_var(DISCORD_WEBHOOK_URL, "DISCORD_WEBHOOK_URL")
+    _check_env_var(TELEGRAM_BOT_TOKEN, "TELEGRAM_BOT_TOKEN")
+    _check_env_var(TELEGRAM_CHANNEL_ID, "TELEGRAM_CHANNEL_ID")
+
+
 # Get Discord webhook URL and Telegram credentials
-DISCORD_WEBHOOK_URL = check_env_var("DISCORD_WEBHOOK_URL")
-TELEGRAM_BOT_TOKEN = check_env_var("TELEGRAM_BOT_TOKEN")
-TELEGRAM_CHANNEL_ID = check_env_var("TELEGRAM_CHANNEL_ID")
+DISCORD_WEBHOOK_URL = os.getenv("DISCORD_WEBHOOK_URL")
+TELEGRAM_BOT_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN")
+TELEGRAM_CHANNEL_ID = os.getenv("TELEGRAM_CHANNEL_ID")
 
 # Constants
 DB_FILE = os.getenv("DB_PATH", "wca_tracker.sqlite3")

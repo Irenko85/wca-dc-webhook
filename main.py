@@ -7,6 +7,7 @@ from typing import List, Dict, Set, Optional, Any, Union
 from pathlib import Path
 from bs4 import BeautifulSoup
 
+import config
 from config import (
     DISCORD_WEBHOOK_URL,
     TELEGRAM_BOT_TOKEN,
@@ -1060,6 +1061,7 @@ def send_registration_open_notification(competition: Dict[str, Any]) -> bool:
 
 def main() -> None:
     """Main function to run the WCA competition tracker."""
+    config.bootstrap()
     logger.info("Starting WCA competition tracking")
 
     # Ensure data files exist
