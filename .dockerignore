@@ -1,0 +1,29 @@
+# Git
+.git
+.gitignore
+
+# Environment
+.env
+
+# Python artifacts
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.venv/
+*.egg-info/
+
+# Data (persisted via volume)
+data/
+
+# Docs and plans
+docs/
+
+# Legacy JSON files (replaced by SQLite)
+prev_comps.json
+registration_tracking.json
+spots_tracking.json
+
+# IDE
+.vscode/
+.idea/
