@@ -62,7 +62,7 @@ TELEGRAM_CHANNEL_ID = os.getenv("TELEGRAM_CHANNEL_ID")
 DB_FILE = os.getenv("DB_PATH", "wca_tracker.sqlite3")
 DEFAULT_COUNTRY = "CL"  # Chile as default country
 REQUEST_TIMEOUT = 10  # seconds
-REGISTRATION_UPCOMING_WINDOW = 60  # minutes before registration opens to send "upcoming" notification
+REGISTRATION_UPCOMING_WINDOW = 90  # minutes before registration opens to send "upcoming" notification; > polling interval (60m) to avoid race condition
 SPOTS_WARNING_THRESHOLD = 0.80  # Notify when 80% of spots are taken
 
 # Dictionary for competition event categories
