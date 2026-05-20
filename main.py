@@ -29,7 +29,7 @@ def main() -> None:
     if new_comps:
         notifications.send_discord_notification(new_comps, is_new=True)
         notifications.send_telegram_notification(new_comps, is_new=True)
-        database.save_competitions(current_comps)
+    database.save_competitions(current_comps)
 
     tracking = database.load_registration_tracking()
     upcoming_reg = detection.detect_registration_opening_soon(current_comps, tracking)
@@ -42,6 +42,7 @@ def main() -> None:
         if notifications.send_registration_open_notification(comp):
             database.mark_registration_open(comp["id"], tracking)
 
+    database.save_registration_tracking(tracking)
     spots_tracking = database.load_spots_tracking()
     limited_spots = detection.detect_limited_spots(current_comps, spots_tracking)
     for comp in limited_spots:
