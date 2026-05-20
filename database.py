@@ -196,6 +196,30 @@ def save_spots_tracking(tracking_data: Dict[str, Dict[str, Any]]) -> None:
     logger.info("Updated spots tracking in database")
 
 
+def mark_registration_upcoming(comp_id: str, tracking: Dict[str, Dict[str, bool]]) -> None:
+    """Mark a competition as notified for upcoming registration and persist."""
+    if comp_id not in tracking:
+        tracking[comp_id] = {"notified_upcoming": False, "notified_open": False}
+    tracking[comp_id]["notified_upcoming"] = True
+    save_registration_tracking(tracking)
+
+
+def mark_registration_open(comp_id: str, tracking: Dict[str, Dict[str, bool]]) -> None:
+    """Mark a competition as notified for registration open and persist."""
+    if comp_id not in tracking:
+        tracking[comp_id] = {"notified_upcoming": False, "notified_open": False}
+    tracking[comp_id]["notified_open"] = True
+    save_registration_tracking(tracking)
+
+
+def mark_spots_notified(comp_id: str, spots_tracking: Dict[str, Dict[str, Any]]) -> None:
+    """Mark a competition as notified for limited spots and persist."""
+    if comp_id not in spots_tracking:
+        spots_tracking[comp_id] = {}
+    spots_tracking[comp_id]["notified"] = True
+    save_spots_tracking(spots_tracking)
+
+
 def clean_old_spots_tracking() -> int:
     """Elimina tracking de cupos de competencias que ya han comenzado o no existen."""
     today = datetime.now().date().isoformat()
