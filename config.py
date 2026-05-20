@@ -1,5 +1,7 @@
 import os
 import logging
+import datetime
+import zoneinfo
 from typing import Optional
 from dotenv import load_dotenv
 
@@ -18,13 +20,34 @@ def _check_env_var(value: Optional[str], var_name: str) -> Optional[str]:
     return value
 
 
+class ChileFormatter(logging.Formatter):
+    """Custom formatter that uses America/Santiago timezone for timestamps."""
+
+    _tz = None
+
+    @classmethod
+    def _get_tz(cls):
+        if cls._tz is None:
+            try:
+                cls._tz = zoneinfo.ZoneInfo("America/Santiago")
+            except (zoneinfo.ZoneInfoNotFoundError, ModuleNotFoundError):
+                cls._tz = datetime.timezone.utc
+        return cls._tz
+
+    def formatTime(self, record, datefmt=None):
+        dt = datetime.datetime.fromtimestamp(record.created, tz=self._get_tz())
+        if datefmt:
+            return dt.strftime(datefmt)
+        return dt.strftime("%Y-%m-%d %H:%M:%S")
+
+
 def bootstrap() -> None:
     """Initialize logging configuration and validate environment variables."""
-    logging.basicConfig(
-        level=logging.INFO,
-        format="%(asctime)s - %(levelname)s - %(message)s",
-        datefmt="%Y-%m-%d %H:%M:%S",
+    handler = logging.StreamHandler()
+    handler.setFormatter(
+        ChileFormatter("%(asctime)s - %(levelname)s - %(message)s")
     )
+    logging.basicConfig(level=logging.INFO, handlers=[handler])
     _check_env_var(DISCORD_WEBHOOK_URL, "DISCORD_WEBHOOK_URL")
     _check_env_var(TELEGRAM_BOT_TOKEN, "TELEGRAM_BOT_TOKEN")
     _check_env_var(TELEGRAM_CHANNEL_ID, "TELEGRAM_CHANNEL_ID")
