@@ -42,7 +42,6 @@ def main() -> None:
         if notifications.send_registration_open_notification(comp):
             database.mark_registration_open(comp["id"], tracking)
 
-    database.save_registration_tracking(tracking)
     spots_tracking = database.load_spots_tracking()
     limited_spots = detection.detect_limited_spots(current_comps, spots_tracking)
     for comp in limited_spots:
