@@ -13,6 +13,7 @@ from config import (
     SPOTS_WARNING_THRESHOLD,
     EVENTS,
     EMBED_COLORS,
+    DEFAULT_COUNTRY,
 )
 
 from database import (

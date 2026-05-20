@@ -1,7 +1,6 @@
 import requests
 import logging
 from typing import Any, Dict, List, Optional
-from bs4 import BeautifulSoup
 from config import REQUEST_TIMEOUT, DEFAULT_COUNTRY
 
 logger = logging.getLogger(__name__)
