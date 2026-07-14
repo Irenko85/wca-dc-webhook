@@ -2,11 +2,11 @@
 
 [English](README.md) · [Español](README.es.md)
 
-Este proyecto revisa las próximas competencias de la World Cube Association y avisa por Discord, Telegram o ambos cuando hay algo importante: una competencia nueva, una inscripción que está por abrir, una inscripción abierta o pocos cupos disponibles.
+Este proyecto monitorea las próximas competencias de la World Cube Association y avisa por Discord, Telegram o ambos cuando hay algo importante: una competencia nueva, una inscripción que está por abrir, una inscripción abierta o pocos cupos disponibles.
 
-## ¿Por qué hice este proyecto?
+## Contexto
 
-Yo era speedcuber y participaba en competencias, pero cuando entré a la universidad ya no tenía tanto tiempo para revisar la página de la WCA. A veces me enteraba tarde de una competencia o, cuando intentaba inscribirme, los cupos ya estaban llenos.
+Yo como speedcuber, participaba en competencias, pero cuando entré a la universidad ya no tenía tanto tiempo para revisar la página de la WCA. A veces me enteraba tarde de una competencia o, cuando intentaba inscribirme, los cupos ya estaban llenos.
 
 La primera solución fue [`wca-bot`](https://github.com/Irenko85/wca-bot), un bot de Discord que hice en 2023. Con el tiempo fui separando el monitoreo del bot y este repositorio terminó convirtiéndose en el proyecto actual.
 
@@ -34,11 +34,11 @@ flowchart LR
     Outbox --> Telegram["Bot de Telegram"]
 ```
 
-Antes de enviar una alerta, el monitor la guarda en SQLite. Discord y Telegram tienen registros de entrega separados, así que un problema en uno de los canales no provoca mensajes duplicados en el otro.
+Antes de enviar una alerta, el monitor la guarda en una db SQLite. Discord y Telegram tienen registros de entrega separados, así que un problema en uno de los canales no provoca mensajes duplicados en el otro.
 
 ## Inicio rápido con Docker
 
-Necesitas:
+Necesario:
 
 - Docker Engine con Docker Compose.
 - Un webhook de Discord, las credenciales de un bot de Telegram o ambos.
@@ -49,7 +49,7 @@ cd wca-dc-webhook
 cp .env.example .env
 ```
 
-Edita `.env`, desactiva los canales que no vayas a usar y agrega las credenciales correspondientes. Después puedes levantar el monitor con:
+Editar `.env`, desactivar los canales que no vayas a usar y agrega las credenciales correspondientes. Después levantar el monitor con:
 
 ```bash
 mkdir -p data
@@ -57,7 +57,7 @@ docker compose up -d --build
 docker compose logs -f
 ```
 
-La base de datos queda en `./data/wca_tracker.sqlite3`, por lo que el estado se mantiene aunque vuelvas a crear el contenedor.
+La base de datos queda en `./data/wca_tracker.sqlite3`, por lo que el estado se mantiene aunque se vuelva a crear el contenedor.
 
 ## Configuración
 
@@ -73,12 +73,12 @@ La base de datos queda en `./data/wca_tracker.sqlite3`, por lo que el estado se 
 | `REQUEST_TIMEOUT_SECONDS` | `10` | Tiempo máximo de espera para las solicitudes HTTP. |
 | `DB_PATH` | `data/wca_tracker.sqlite3` | Ruta de la base de datos. En Docker se usa `/app/data/wca_tracker.sqlite3`. |
 | `DISCORD_ENABLED` | inferido | Permite activar o desactivar Discord. |
-| `DISCORD_WEBHOOK_URL` | — | URL del webhook de Discord. |
+| `DISCORD_WEBHOOK_URL` | - | URL del webhook de Discord. |
 | `TELEGRAM_ENABLED` | inferido | Permite activar o desactivar Telegram. |
-| `TELEGRAM_BOT_TOKEN` | — | Token del bot de Telegram. |
-| `TELEGRAM_CHANNEL_ID` | — | ID del chat o canal donde se enviarán los mensajes. |
+| `TELEGRAM_BOT_TOKEN` | - | Token del bot de Telegram. |
+| `TELEGRAM_CHANNEL_ID` | - | ID del chat o canal donde se enviarán los mensajes. |
 
-Si no defines `DISCORD_ENABLED` o `TELEGRAM_ENABLED`, el monitor intenta habilitar el canal cuando encuentra todas sus credenciales.
+Si no se define `DISCORD_ENABLED` o `TELEGRAM_ENABLED`, el monitor intenta habilitar el canal cuando encuentra todas las credenciales.
 
 ### Ejemplo: Nueva Zelanda con mensajes en inglés
 
@@ -104,7 +104,7 @@ python -m ruff check .
 python -m ruff format --check .
 ```
 
-Para ejecutar el monitor fuera de Docker, crea el archivo `.env` y usa:
+Para ejecutar el monitor fuera de Docker, crear el archivo `.env` y usar:
 
 ```bash
 python -m wca_notifier
