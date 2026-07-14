@@ -136,7 +136,10 @@ This repository became the independent monitor in 2025. It evolved from a schedu
 ## Roadmap
 
 - Add Portuguese notifications.
-- Add sanitized notification screenshots to the documentation.
 - Support additional delivery adapters without expanding the monitoring interface.
+
+## License
+
+Released under the [MIT License](LICENSE).
 
 This project is not affiliated with or endorsed by the World Cube Association.

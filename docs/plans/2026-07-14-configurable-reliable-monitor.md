@@ -136,7 +136,7 @@ No commit steps are included because commits require explicit user authorization
 
 1. Make English the primary README and link both languages at the top.
 2. Explain the personal speedcubing problem, the 2023 Discord bot predecessor, and the evolution to a self-hosted multichannel monitor.
-3. Document features, architecture, configuration, Docker usage, testing, reliability semantics, screenshots placeholders, and roadmap.
+3. Document features, architecture, configuration, Docker usage, testing, reliability semantics, and roadmap.
 4. State that Chile is the default use case while any WCA country ISO2 can be configured.
 
 ### Task 11: Final verification

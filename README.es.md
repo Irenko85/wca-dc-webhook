@@ -2,42 +2,46 @@
 
 [English](README.md) · [Español](README.es.md)
 
-Monitor configurable y autoalojado que observa las próximas competencias de la World Cube Association y envía notificaciones oportunas por Discord y Telegram.
+Este proyecto revisa las próximas competencias de la World Cube Association y avisa por Discord, Telegram o ambos cuando hay algo importante: una competencia nueva, una inscripción que está por abrir, una inscripción abierta o pocos cupos disponibles.
 
-El proyecto nació de un problema personal. Antes competía como speedcuber, pero al entrar a la universidad dejé de tener tiempo para revisar regularmente el sitio de la WCA. Más de una vez encontré una competencia cuando las inscripciones ya estaban completas. Construí este monitor para recibir directamente los anuncios de competencias, aperturas de registro y alertas de pocos cupos.
+## ¿Por qué hice este proyecto?
 
-Chile es la configuración predeterminada y el caso de uso original, pero se puede configurar cualquier código ISO2 aceptado por la WCA.
+Yo era speedcuber y participaba en competencias, pero cuando entré a la universidad ya no tenía tanto tiempo para revisar la página de la WCA. A veces me enteraba tarde de una competencia o, cuando intentaba inscribirme, los cupos ya estaban llenos.
 
-## Funcionalidades
+La primera solución fue [`wca-bot`](https://github.com/Irenko85/wca-bot), un bot de Discord que hice en 2023. Con el tiempo fui separando el monitoreo del bot y este repositorio terminó convirtiéndose en el proyecto actual.
 
-- Detecta competencias WCA recién anunciadas.
+Lo uso para seguir las competencias de Chile, pero dejé configurables el país, la zona horaria, el idioma y los parámetros de las alertas para que también se pueda usar en otros países.
+
+## ¿Qué hace?
+
+- Avisa cuando aparece una competencia nueva en la WCA.
 - Avisa poco antes de que abra una inscripción.
-- Notifica cuando la inscripción ya está abierta.
-- Advierte cuando los inscritos aceptados alcanzan un umbral configurable.
-- Envía notificaciones a Discord, Telegram o ambos.
-- Admite notificaciones en español e inglés.
-- Persiste el estado y las entregas por canal en SQLite.
-- Reintenta un canal fallido sin repetir la notificación en los canales exitosos.
-- Se ejecuta como contenedor Docker endurecido y con healthcheck.
+- Notifica cuando la inscripción ya abrió.
+- Revisa cuántos competidores fueron aceptados y avisa cuando quedan pocos cupos.
+- Puede enviar mensajes por Discord, Telegram o ambos.
+- Los mensajes pueden estar en español o inglés.
+- Guarda el estado en SQLite para no repetir alertas.
+- Si un canal falla, lo reintenta sin volver a enviar el mensaje al canal que ya funcionó.
+- Se puede ejecutar con Docker en un servidor propio.
 
 ## Cómo funciona
 
 ```mermaid
 flowchart LR
-    WCA["APIs WCA y WCIF pública"] --> Monitor["Ciclo de detección"]
-    Monitor --> Outbox["Outbox de notificaciones en SQLite"]
+    WCA["API de la WCA y WCIF pública"] --> Monitor["Ciclo de monitoreo"]
+    Monitor --> Outbox["Eventos pendientes en SQLite"]
     Outbox --> Discord["Webhook de Discord"]
-    Outbox --> Telegram["API de bots de Telegram"]
+    Outbox --> Telegram["Bot de Telegram"]
 ```
 
-Cada evento se guarda antes de intentar entregarlo. Discord y Telegram mantienen registros independientes, por lo que una caída parcial puede reintentarse sin duplicar mensajes en el canal que ya funcionó.
+Antes de enviar una alerta, el monitor la guarda en SQLite. Discord y Telegram tienen registros de entrega separados, así que un problema en uno de los canales no provoca mensajes duplicados en el otro.
 
 ## Inicio rápido con Docker
 
-Requisitos:
+Necesitas:
 
-- Docker Engine con Docker Compose
-- Un webhook de Discord, credenciales de un bot de Telegram o ambos
+- Docker Engine con Docker Compose.
+- Un webhook de Discord, las credenciales de un bot de Telegram o ambos.
 
 ```bash
 git clone https://github.com/Irenko85/wca-dc-webhook.git
@@ -45,7 +49,7 @@ cd wca-dc-webhook
 cp .env.example .env
 ```
 
-Edita `.env`, deshabilita los canales que no usarás y reemplaza las credenciales de ejemplo. Luego inicia el monitor:
+Edita `.env`, desactiva los canales que no vayas a usar y agrega las credenciales correspondientes. Después puedes levantar el monitor con:
 
 ```bash
 mkdir -p data
@@ -53,28 +57,28 @@ docker compose up -d --build
 docker compose logs -f
 ```
 
-El estado SQLite queda en `./data/wca_tracker.sqlite3` y persiste al recrear el contenedor.
+La base de datos queda en `./data/wca_tracker.sqlite3`, por lo que el estado se mantiene aunque vuelvas a crear el contenedor.
 
 ## Configuración
 
-| Variable | Predeterminado | Descripción |
+| Variable | Valor predeterminado | Para qué sirve |
 |---|---:|---|
-| `WCA_COUNTRY_ISO2` | `CL` | Código de país de dos letras usado por la API de la WCA. |
-| `TZ` | `America/Santiago` | Zona horaria IANA para fechas locales y logs. |
-| `NOTIFICATION_LANGUAGE` | `es` | Idioma de notificaciones: `es` o `en`. |
-| `POLL_INTERVAL_SECONDS` | `3600` | Espera entre ciclos de monitoreo. |
-| `REGISTRATION_UPCOMING_MINUTES` | `90` | Anticipación para el recordatorio de inscripción. |
-| `REGISTRATION_OPEN_GRACE_MINUTES` | `90` | Ventana de alerta; debe superar el intervalo de monitoreo. |
-| `SPOTS_WARNING_PERCENT` | `0.80` | Proporción que activa la alerta de pocos cupos. |
-| `REQUEST_TIMEOUT_SECONDS` | `10` | Timeout de solicitudes HTTP. |
-| `DB_PATH` | `data/wca_tracker.sqlite3` | Ruta del estado SQLite. Docker usa `/app/data/wca_tracker.sqlite3`. |
-| `DISCORD_ENABLED` | inferido | Habilita o deshabilita Discord explícitamente. |
+| `WCA_COUNTRY_ISO2` | `CL` | Código ISO2 del país que se consultará en la WCA. |
+| `TZ` | `America/Santiago` | Zona horaria usada para las fechas y los logs. |
+| `NOTIFICATION_LANGUAGE` | `es` | Idioma de los mensajes: `es` o `en`. |
+| `POLL_INTERVAL_SECONDS` | `3600` | Tiempo de espera entre cada revisión. |
+| `REGISTRATION_UPCOMING_MINUTES` | `90` | Cuánto antes se avisa que una inscripción está por abrir. |
+| `REGISTRATION_OPEN_GRACE_MINUTES` | `90` | Ventana para detectar una inscripción recién abierta; debe ser mayor que el intervalo de monitoreo. |
+| `SPOTS_WARNING_PERCENT` | `0.80` | Porcentaje de cupos ocupados que activa la alerta. |
+| `REQUEST_TIMEOUT_SECONDS` | `10` | Tiempo máximo de espera para las solicitudes HTTP. |
+| `DB_PATH` | `data/wca_tracker.sqlite3` | Ruta de la base de datos. En Docker se usa `/app/data/wca_tracker.sqlite3`. |
+| `DISCORD_ENABLED` | inferido | Permite activar o desactivar Discord. |
 | `DISCORD_WEBHOOK_URL` | — | URL del webhook de Discord. |
-| `TELEGRAM_ENABLED` | inferido | Habilita o deshabilita Telegram explícitamente. |
+| `TELEGRAM_ENABLED` | inferido | Permite activar o desactivar Telegram. |
 | `TELEGRAM_BOT_TOKEN` | — | Token del bot de Telegram. |
-| `TELEGRAM_CHANNEL_ID` | — | ID del chat o canal de destino. |
+| `TELEGRAM_CHANNEL_ID` | — | ID del chat o canal donde se enviarán los mensajes. |
 
-Por compatibilidad, un canal se habilita automáticamente si sus credenciales completas están presentes y se omite su flag explícito.
+Si no defines `DISCORD_ENABLED` o `TELEGRAM_ENABLED`, el monitor intenta habilitar el canal cuando encuentra todas sus credenciales.
 
 ### Ejemplo: Nueva Zelanda con mensajes en inglés
 
@@ -89,7 +93,7 @@ TELEGRAM_ENABLED=false
 
 ## Desarrollo local
 
-Se requiere Python 3.12 o superior.
+Se necesita Python 3.12 o una versión más reciente.
 
 ```bash
 python -m venv .venv
@@ -100,43 +104,46 @@ python -m ruff check .
 python -m ruff format --check .
 ```
 
-Para ejecutar localmente, crea `.env` y usa:
+Para ejecutar el monitor fuera de Docker, crea el archivo `.env` y usa:
 
 ```bash
 python -m wca_notifier
 ```
 
-## Estructura
+## Estructura del proyecto
 
 ```text
 src/wca_notifier/
-├── config.py          # Configuración validada
-├── detection.py       # Detección pura de eventos
-├── events.py          # Modelo de eventos
-├── repository.py      # Estado SQLite y outbox de entregas
-├── monitor.py         # Interfaz de un ciclo de monitoreo
-├── wca_client.py      # Adapter de WCA y WCIF pública
-├── i18n.py            # Carga de catálogos
-├── locales/           # Catálogos en inglés y español
-└── notifications/     # Adapters y formato para Discord y Telegram
+├── config.py          # Configuración y validaciones
+├── detection.py       # Detección de los eventos
+├── events.py          # Modelo de las notificaciones
+├── repository.py      # Estado SQLite y entregas pendientes
+├── monitor.py         # Ejecución de un ciclo de monitoreo
+├── wca_client.py      # Consultas a la WCA y WCIF pública
+├── i18n.py            # Carga de los mensajes traducidos
+├── locales/           # Mensajes en inglés y español
+└── notifications/     # Envío y formato para Discord y Telegram
 ```
 
 ## Actualización desde la versión anterior
 
-La base SQLite actual se reutiliza. Al iniciar, el tracking heredado de registros y cupos se migra a entregas completadas por canal, evitando que se vuelvan a enviar alertas antiguas.
+El monitor sigue usando la base de datos SQLite existente. Al iniciar, convierte el seguimiento anterior de inscripciones y cupos al formato nuevo para evitar que se vuelvan a enviar alertas antiguas.
 
-Los JSON que usaba la versión ejecutada mediante GitHub Actions dejaron de utilizarse. El estado de ejecución pertenece a `data/` y no debe versionarse.
+Los archivos JSON que usaba la versión ejecutada mediante GitHub Actions ya no son necesarios. El estado actual se guarda dentro de `data/` y no debe subirse al repositorio.
 
 ## Historia
 
-La primera versión fue [`wca-bot`](https://github.com/Irenko85/wca-bot), un bot de Discord creado en 2023. Permitía consultar competencias mediante comandos y revisaba periódicamente la aparición de eventos nuevos.
+El proyecto comenzó con [`wca-bot`](https://github.com/Irenko85/wca-bot), un bot de Discord que hice en 2023 para consultar competencias y detectar eventos nuevos.
 
-Este repositorio se convirtió en el monitor independiente durante 2025. Evolucionó desde una GitHub Action programada con estado JSON hacia un proceso Docker autoalojado con SQLite, Telegram, alertas de inscripción, detección de pocos cupos, mensajes bilingües y reintentos confiables por canal.
+En 2025 separé el monitor en este repositorio. Al principio se ejecutaba con GitHub Actions y guardaba el estado en archivos JSON. Después lo fui migrando a Docker y SQLite, y agregué Telegram, alertas de inscripción, seguimiento de cupos, mensajes traducidos y reintentos separados por canal.
 
-## Roadmap
+## Pendiente
 
-- Agregar notificaciones en portugués.
-- Incorporar capturas sanitizadas de las notificaciones.
-- Permitir adapters adicionales sin ampliar la interfaz del monitor.
+- Agregar mensajes en portugués.
+- Permitir otros canales de notificación sin tener que cambiar el monitor.
+
+## Licencia
+
+El proyecto está publicado bajo la [licencia MIT](LICENSE).
 
 Este proyecto no está afiliado ni respaldado por la World Cube Association.
