@@ -1,0 +1,20 @@
+{
+  "event.competition_new.title": "{count} new competition!",
+  "event.competition_new.badge": "NEW",
+  "event.registration_upcoming.title": "Registration opens soon!",
+  "event.registration_upcoming.detail": "Registration opens in ~{minutes} minutes",
+  "event.registration_open.title": "REGISTRATION OPEN!",
+  "event.registration_open.detail": "Registration is open now!",
+  "event.spots_limited.title": "LIMITED SPOTS!",
+  "event.spots_limited.detail": "Only {spots_left} spots left!",
+  "field.city": "City",
+  "field.date": "Date",
+  "field.registration": "Registration",
+  "field.competitor_limit": "Competitor limit",
+  "field.events": "Events",
+  "field.registered": "Registered",
+  "link.more_information": "More information",
+  "link.register": "Register here",
+  "fallback.no_events": "No events available",
+  "status.ongoing": "ONGOING"
+}

@@ -1,11 +1,14 @@
-.venv
+.venv/
 .env
 __pycache__/
 *.pyc
 *.pyo
+.pytest_cache/
+.ruff_cache/
+*.egg-info/
+build/
+dist/
+*.sqlite3
 
-# Entorno local
-.env
-
-# Base de datos local (persiste en el servidor)
+# Runtime data persists outside Git
 data/
